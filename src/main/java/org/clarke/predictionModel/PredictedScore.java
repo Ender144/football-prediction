@@ -19,4 +19,14 @@ public class PredictedScore
     {
         return theirScore;
     }
+
+    public Outcome getPredictedOutcome()
+    {
+        if (ourScore == 0 && theirScore == 0)
+        {
+            return Outcome.UNPLAYED;
+        }
+
+        return ourScore > theirScore ? Outcome.WIN : Outcome.LOSE;
+    }
 }

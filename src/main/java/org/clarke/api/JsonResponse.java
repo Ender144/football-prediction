@@ -1,4 +1,4 @@
-package org.clarke.data;
+package org.clarke.api;
 
 public class JsonResponse
 {

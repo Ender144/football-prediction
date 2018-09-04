@@ -1,4 +1,4 @@
-package org.clarke.data;
+package org.clarke.api;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ResponseHandler;

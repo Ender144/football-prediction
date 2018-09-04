@@ -1,6 +1,4 @@
-package org.clarke.data;
-
-import org.clarke.configuration.Configuration;
+package org.clarke.configuration;
 
 public class SR_API_Configuration
 {

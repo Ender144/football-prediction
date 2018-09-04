@@ -2,9 +2,14 @@ package org.clarke.seasonModel;
 
 import java.util.List;
 
-public class Week
+class Week
 {
-    public String id;
-    public String number;
-    public List<Game> games;
+    private String id;
+    private String number;
+    private List<Game> games;
+
+    List<Game> getGames()
+    {
+        return games;
+    }
 }

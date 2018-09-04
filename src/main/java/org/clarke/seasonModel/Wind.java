@@ -1,7 +1,7 @@
 package org.clarke.seasonModel;
 
-public class Wind
+class Wind
 {
-    public String speed;
-    public String direction;
+    private String speed;
+    private String direction;
 }

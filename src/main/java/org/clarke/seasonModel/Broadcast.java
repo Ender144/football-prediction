@@ -1,7 +1,7 @@
 package org.clarke.seasonModel;
 
-public class Broadcast
+class Broadcast
 {
-    public String network;
-    public String satellite;
+    private String network;
+    private String satellite;
 }

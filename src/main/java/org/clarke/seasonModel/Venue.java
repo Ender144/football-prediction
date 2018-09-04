@@ -1,14 +1,14 @@
 package org.clarke.seasonModel;
 
-public class Venue
+class Venue
 {
-    public String id;
-    public String country;
-    public String name;
-    public String city;
-    public String state;
-    public String capacity;
-    public String type;
-    public String zip;
-    public String address;
+    private String id;
+    private String country;
+    private String name;
+    private String city;
+    private String state;
+    private String capacity;
+    private String type;
+    private String zip;
+    private String address;
 }

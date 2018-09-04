@@ -1,9 +1,9 @@
 package org.clarke.seasonModel;
 
-public class Weather
+class Weather
 {
-    public String temperature;
-    public String condiditon;
-    public String humidity;
-    public Wind wind;
+    private String temperature;
+    private String condiditon;
+    private String humidity;
+    private Wind wind;
 }

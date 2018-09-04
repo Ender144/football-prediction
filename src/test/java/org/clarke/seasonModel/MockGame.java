@@ -1,0 +1,39 @@
+package org.clarke.seasonModel;
+
+class MockGame extends Game
+{
+    public int getOurScore()
+    {
+        return Integer.parseInt(home_points);
+    }
+
+    void setOurScore(int score)
+    {
+        home_points = String.valueOf(score);
+    }
+
+    public int getTheirScore()
+    {
+        return Integer.parseInt(away_points);
+    }
+
+    void setTheirScore(int score)
+    {
+        away_points = String.valueOf(score);
+    }
+
+    void setScheduled(String scheduled)
+    {
+        this.scheduled = scheduled;
+    }
+
+    void setOurTeam(String team)
+    {
+        home = team;
+    }
+
+    void setTheirTeam(String team)
+    {
+        away = team;
+    }
+}

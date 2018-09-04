@@ -5,9 +5,9 @@ import java.util.List;
 
 public class RegularSeason
 {
-    public String season;
-    public String type;
-    public List<Week> weeks;
+    private String season;
+    private String type;
+    private List<Week> weeks;
 
     public List<Game> getGamesByTeam(String teamName)
     {
@@ -15,9 +15,9 @@ public class RegularSeason
 
         for (Week week : weeks)
         {
-            for (Game game : week.games)
+            for (Game game : week.getGames())
             {
-                if (teamName.equalsIgnoreCase(game.away) || teamName.equalsIgnoreCase(game.home))
+                if (teamName.equalsIgnoreCase(game.getAwayTeam()) || teamName.equalsIgnoreCase(game.getHomeTeam()))
                 {
                     games.add(game);
                 }
@@ -25,5 +25,20 @@ public class RegularSeason
         }
 
         return games;
+    }
+
+    public List<Game> getMichiganGamesThisSeason()
+    {
+        return getGamesByTeam("mich");
+    }
+
+    public String getSeason()
+    {
+        return season;
+    }
+
+    public List<Week> getWeeks()
+    {
+        return weeks;
     }
 }

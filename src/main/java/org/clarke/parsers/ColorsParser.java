@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class ColorsParser
+class ColorsParser
 {
     private static final String COLORS_SHEET = "/team_colors.xlsx";
 
@@ -26,7 +26,7 @@ public class ColorsParser
         parseColors();
     }
 
-    public static ColorsParser getInstance()
+    static ColorsParser getInstance()
     {
         if (instance == null)
         {
@@ -36,7 +36,7 @@ public class ColorsParser
         return instance;
     }
 
-    public Pair<String, String> getTeamColors(String teamName)
+    Pair<String, String> getTeamColors(String teamName)
     {
         return teamColorMap.get(teamName.toLowerCase());
     }
