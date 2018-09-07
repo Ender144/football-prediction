@@ -1,4 +1,4 @@
-package org.clarke.seasonModel;
+package org.clarke.regularSeasonModel;
 
 import java.util.ArrayList;
 import java.util.List;

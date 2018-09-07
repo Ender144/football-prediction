@@ -34,6 +34,7 @@ public class JsonRestMessenger
 
     public static JsonResponse get(String url) throws IOException
     {
+        System.out.println("Fetching URL with GET: " + url);
         return authExecutor.execute(
             Request.Get(url)
         ).handleResponse(responseHandler);

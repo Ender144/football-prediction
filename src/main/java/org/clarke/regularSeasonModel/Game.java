@@ -1,4 +1,4 @@
-package org.clarke.seasonModel;
+package org.clarke.regularSeasonModel;
 
 import org.clarke.predictionModel.Outcome;
 
@@ -27,6 +27,16 @@ public class Game implements Comparable<Game>
     public int compareTo(Game otherGame)
     {
         return getDate().compareTo(otherGame.getDate());
+    }
+
+    public String them()
+    {
+        return away.equalsIgnoreCase("mich") ? home : away;
+    }
+
+    public String us()
+    {
+        return away.equalsIgnoreCase("mich") ? away : home;
     }
 
     public Outcome getActualOutcome()

@@ -2,8 +2,8 @@ package org.clarke.predictionModel;
 
 import org.clarke.ExcelSeasonOutput;
 import org.clarke.Main;
-import org.clarke.seasonModel.MockRegularSeason;
-import org.clarke.seasonModel.RegularSeason;
+import org.clarke.regularSeasonModel.MockRegularSeason;
+import org.clarke.regularSeasonModel.RegularSeason;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

@@ -7,36 +7,37 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-class ColorsParser
+public class TeamColorsManager
 {
     private static final String COLORS_SHEET = "/team_colors.xlsx";
 
-    private static ColorsParser instance;
+    private static TeamColorsManager instance;
 
-    private Map<String, Pair<String, String>> teamColorMap = new HashMap<>();
+    private Map<String, Pair<Color, Color>> teamColorMap = new HashMap<>();
 
-    private ColorsParser()
+    private TeamColorsManager()
     {
         parseColors();
     }
 
-    static ColorsParser getInstance()
+    public static TeamColorsManager getInstance()
     {
         if (instance == null)
         {
-            instance = new ColorsParser();
+            instance = new TeamColorsManager();
         }
 
         return instance;
     }
 
-    Pair<String, String> getTeamColors(String teamName)
+    public Pair<Color, Color> getTeamColors(String teamName)
     {
         return teamColorMap.get(teamName.toLowerCase());
     }
@@ -82,7 +83,7 @@ class ColorsParser
                             secondaryColor = secondaryCell.getStringCellValue().toLowerCase();
                         }
 
-                        teamColorMap.put(teamName, Pair.of(primaryColor, secondaryColor));
+                        teamColorMap.put(teamName, Pair.of(Color.decode(primaryColor), Color.decode(secondaryColor)));
                     }
                 }
             }

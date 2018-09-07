@@ -1,6 +1,6 @@
 package org.clarke.predictionModel;
 
-import org.clarke.seasonModel.Game;
+import org.clarke.regularSeasonModel.Game;
 
 import java.util.Map;
 

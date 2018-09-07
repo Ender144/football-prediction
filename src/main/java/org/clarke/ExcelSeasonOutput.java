@@ -1,17 +1,27 @@
 package org.clarke;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.clarke.parsers.TeamColorsManager;
 import org.clarke.predictionModel.ParticipantScores;
 import org.clarke.predictionModel.PredictedScore;
 import org.clarke.predictionModel.SeasonPrediction;
-import org.clarke.seasonModel.Game;
-import org.clarke.seasonModel.RegularSeason;
+import org.clarke.regularSeasonModel.Game;
+import org.clarke.regularSeasonModel.RegularSeason;
+import org.clarke.rosterModel.Team;
 
+import java.awt.Color;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -26,7 +36,12 @@ public class ExcelSeasonOutput
 
     private static final String WEEKLY_RESULT = "Weekly Result";
 
-    public static void printExcelSheet(RegularSeason season, List<SeasonPrediction> predictions) throws IOException
+    private static final XSSFWorkbook workbook = new XSSFWorkbook();
+    private static final TeamColorsManager colors = TeamColorsManager.getInstance();
+    private static final Pair<Color, Color> michiganColors = colors.getTeamColors("michigan");
+    private static int rowNumber = 0;
+
+    public static void printExcelSheet(RegularSeason season, List<SeasonPrediction> predictions, Map<String, Team> opponents) throws IOException
     {
         String sheetName = season.getSeason();
         String fileName = sheetName + SHEET_SUFFIX + ".xlsx";
@@ -34,29 +49,120 @@ public class ExcelSeasonOutput
 
         ParticipantScores scores = new ParticipantScores(predictions, season);
 
-        XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet(sheetName);
-        int rowIndex = 0;
 
-        writeTitleRow(sheet, title, rowIndex++);
-        writeNamesRow(sheet, predictions, rowIndex++);
-        writeHeadersRow(sheet, predictions, rowIndex++);
+        writeTitleRow(sheet, title, rowNumber++);
+        writeNamesRow(sheet, predictions, rowNumber++);
+        writeHeadersRow(sheet, predictions, rowNumber++);
 
+        LocalDate lastGameDay = LocalDate.MIN, nextGameDay;
         for (Game game : season.getMichiganGamesThisSeason())
         {
-            writeGameRow(sheet, game, predictions, scores, rowIndex++);
+            nextGameDay = game.getDate();
+
+            if (!lastGameDay.isEqual(LocalDate.MIN) && !lastGameDay.plusDays(7).isEqual(nextGameDay))
+            {
+                writeByeWeekRow(sheet, lastGameDay.plusDays(7), rowNumber++, 5 + 4 * predictions.size());
+            }
+            writeGameRow(sheet, game, opponents.get(game.them()), predictions, scores, rowNumber++);
+            lastGameDay = nextGameDay;
         }
 
-        rowIndex++;
-        writeResultsRow(sheet, predictions, scores, rowIndex);
+        rowNumber++;
+        writeResultsRow(sheet, predictions, scores, rowNumber);
 
-        rowIndex += 2;
-        writeCurrentStandings(sheet, predictions, scores, rowIndex);
+        rowNumber += 2;
+        writeCurrentStandings(sheet, predictions, scores, rowNumber);
+
+        for (int i = 0; i < predictions.size() * 4 + 7; i++)
+        {
+            sheet.autoSizeColumn(i);
+        }
 
         FileOutputStream fileOutputStream = new FileOutputStream(fileName);
         workbook.write(fileOutputStream);
         fileOutputStream.flush();
         fileOutputStream.close();
+    }
+
+    private static void styleStripe(XSSFCell cell)
+    {
+        Color back, front;
+        if (rowNumber % 2 == 0)
+        {
+            back = michiganColors.getLeft();
+            front = michiganColors.getRight();
+        } else
+        {
+            back = michiganColors.getRight();
+            front = michiganColors.getLeft();
+        }
+
+        XSSFCellStyle style = workbook.createCellStyle();
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setFillForegroundColor(new XSSFColor(front));
+
+        XSSFFont font = workbook.createFont();
+        style.setFillBackgroundColor(new XSSFColor(back));
+        font.setColor(new XSSFColor(back));
+        style.setFont(font);
+
+        style.setAlignment(HorizontalAlignment.CENTER);
+        cell.setCellStyle(style);
+    }
+
+    private static void styleTeamColors(String teamName, XSSFCell cell)
+    {
+        XSSFCellStyle style = workbook.createCellStyle();
+        Pair<Color, Color> teamColors = colors.getTeamColors(teamName);
+
+        if (teamColors != null)
+        {
+            if (teamColors.getLeft() != null)
+            {
+                style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                style.setFillForegroundColor(new XSSFColor(teamColors.getLeft()));
+            }
+
+            XSSFFont font = workbook.createFont();
+            if (teamColors.getRight() != null)
+            {
+                style.setFillBackgroundColor(new XSSFColor(teamColors.getRight()));
+                font.setColor(new XSSFColor(teamColors.getRight()));
+                style.setFont(font);
+            } else
+            {
+                font.setColor(new XSSFColor(Color.BLACK));
+                style.setFont(font);
+            }
+        }
+
+        style.setAlignment(HorizontalAlignment.CENTER);
+        cell.setCellStyle(style);
+    }
+
+    private static void writeByeWeekRow(XSSFSheet sheet, LocalDate byeWeekDate, int rowNumber, int numberOfBlankCells)
+    {
+        XSSFRow byeRow = sheet.createRow(rowNumber);
+        int cellIndex = 0;
+        XSSFCell date, bye;
+
+        date = byeRow.createCell(cellIndex++);
+        XSSFCellStyle centerAligned = workbook.createCellStyle();
+        centerAligned.setAlignment(HorizontalAlignment.CENTER);
+        date.setCellStyle(centerAligned);
+        date.setCellValue(byeWeekDate.toString());
+
+        bye = byeRow.createCell(cellIndex++);
+        styleTeamColors("none", bye);
+        bye.setCellValue("BYE");
+
+        for (int i = 0; i < numberOfBlankCells; i++)
+        {
+            XSSFCell blankCell = byeRow.createCell(cellIndex++);
+            styleStripe(blankCell);
+            blankCell.setCellValue("-");
+        }
     }
 
     private static void writeCurrentStandings(XSSFSheet sheet, List<SeasonPrediction> predictions, ParticipantScores scores, int rowIndex)
@@ -103,7 +209,7 @@ public class ExcelSeasonOutput
         }
     }
 
-    private static void writeGameRow(XSSFSheet sheet, Game game, List<SeasonPrediction> predictions, ParticipantScores scores, int rowNumber)
+    private static void writeGameRow(XSSFSheet sheet, Game game, Team opponentTeam, List<SeasonPrediction> predictions, ParticipantScores scores, int rowNumber)
     {
         XSSFRow gameRow = sheet.createRow(rowNumber);
         int cellIndex = 0;
@@ -114,10 +220,14 @@ public class ExcelSeasonOutput
         int overUnderNumber = ourScore + theirScore;
 
         date = gameRow.createCell(cellIndex++);
+        XSSFCellStyle centerAligned = workbook.createCellStyle();
+        centerAligned.setAlignment(HorizontalAlignment.CENTER);
+        date.setCellStyle(centerAligned);
         date.setCellValue(game.getDate().toString());
 
         opponent = gameRow.createCell(cellIndex++);
-        String opponentAndLocation = game.getAwayTeam().equalsIgnoreCase("mich") ? "AT " + game.getHomeTeam() : "VS " + game.getAwayTeam();
+        String opponentAndLocation = game.getAwayTeam().equalsIgnoreCase("mich") ? "AT " + opponentTeam.getFullTeamName() : "VS " + opponentTeam.getFullTeamName();
+        styleTeamColors(opponentTeam.getFullTeamName(), opponent);
         opponent.setCellValue(opponentAndLocation);
 
         outcome = gameRow.createCell(cellIndex++);
@@ -141,15 +251,19 @@ public class ExcelSeasonOutput
             PredictedScore predictedScore = prediction.getGamePrediction(game);
 
             weeklyScore = gameRow.createCell(cellIndex++);
+            styleStripe(weeklyScore);
             weeklyScore.setCellValue(scores.getScoreForGame(game, prediction.getParticipant()));
 
             predictedOutcome = gameRow.createCell(cellIndex++);
+            styleStripe(predictedOutcome);
             predictedOutcome.setCellValue(predictedScore.getPredictedOutcome().toString());
 
             predictedUs = gameRow.createCell(cellIndex++);
+            styleStripe(predictedUs);
             predictedUs.setCellValue(predictedScore.getOurScore());
 
             predictedThem = gameRow.createCell(cellIndex++);
+            styleStripe(predictedThem);
             predictedThem.setCellValue(predictedScore.getTheirScore());
         }
     }
@@ -182,15 +296,20 @@ public class ExcelSeasonOutput
         for (SeasonPrediction ignored : predictions)
         {
             cellIndex += 2;
+            XSSFCell blankStripe = columnHeadersRow.createCell(cellIndex - 1);
+            styleStripe(blankStripe);
             XSSFCell predictedOutcomeCell = columnHeadersRow.createCell(cellIndex);
+            styleStripe(predictedOutcomeCell);
             predictedOutcomeCell.setCellValue("Outcome");
             cellIndex++;
 
             XSSFCell predictedOurScoreCell = columnHeadersRow.createCell(cellIndex);
+            styleStripe(predictedOurScoreCell);
             predictedOurScoreCell.setCellValue("Us");
             cellIndex++;
 
             XSSFCell predictedTheirScoreCell = columnHeadersRow.createCell(cellIndex);
+            styleStripe(predictedTheirScoreCell);
             predictedTheirScoreCell.setCellValue("Them");
         }
     }
@@ -208,11 +327,19 @@ public class ExcelSeasonOutput
         {
             // Users start in col 8, zero indexed
             XSSFCell weeklyResultCell = namesRow.createCell(cellIndex);
+            styleStripe(weeklyResultCell);
             weeklyResultCell.setCellValue(WEEKLY_RESULT);
+
+            XSSFCell blankStripe1 = namesRow.createCell(cellIndex + 1);
+            styleStripe(blankStripe1);
             cellIndex += 2;
 
             XSSFCell nameCell = namesRow.createCell(cellIndex);
+            styleStripe(nameCell);
             nameCell.setCellValue(prediction.getParticipant());
+
+            XSSFCell blankStripe2 = namesRow.createCell(cellIndex + 1);
+            styleStripe(blankStripe2);
             cellIndex += 2;
         }
     }
@@ -238,7 +365,8 @@ public class ExcelSeasonOutput
     {
         XSSFRow row = sheet.createRow(rowIndex);
         XSSFCell cell = row.createCell(0);
-        //        cell.setCellStyle(null);
+
+        styleTeamColors("michigan", cell);
         cell.setCellValue(title);
     }
 }

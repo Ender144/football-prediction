@@ -1,4 +1,4 @@
-package org.clarke.seasonModel;
+package org.clarke.regularSeasonModel;
 
 class Broadcast
 {

@@ -8,12 +8,14 @@ import org.clarke.configuration.SR_API_Configuration;
 import org.clarke.predictionModel.ParticipantScores;
 import org.clarke.predictionModel.PredictedScore;
 import org.clarke.predictionModel.SeasonPrediction;
-import org.clarke.seasonModel.Game;
-import org.clarke.seasonModel.RegularSeason;
+import org.clarke.regularSeasonModel.Game;
+import org.clarke.regularSeasonModel.RegularSeason;
+import org.clarke.rosterModel.Team;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -34,6 +36,8 @@ public class Main
         participants.add("Tyler");
         participants.add("Heather");
     }
+
+    private static final SR_API_Configuration SR_API_CONFIGURATION = SR_API_Configuration.getInstance();
 
     public static List<SeasonPrediction> initializePredictionModel(RegularSeason regularSeason)
     {
@@ -89,6 +93,9 @@ public class Main
     public static void main(String[] args)
     {
         RegularSeason season2018 = initializeSeasonModel();
+        Map<String, Team> opponents = new HashMap<>();
+        season2018.getMichiganGamesThisSeason().forEach(game -> opponents.put(game.them(), initializeTeam(game.them())));
+
         List<SeasonPrediction> seasonPredictions = initializePredictionModel(season2018);
 
         ParticipantScores scores = new ParticipantScores(seasonPredictions, season2018);
@@ -104,7 +111,7 @@ public class Main
         System.out.println("Printing excel sheet...");
         try
         {
-            ExcelSeasonOutput.printExcelSheet(season2018, seasonPredictions);
+            ExcelSeasonOutput.printExcelSheet(season2018, seasonPredictions, opponents);
         } catch (IOException e)
         {
             e.printStackTrace();
@@ -115,12 +122,10 @@ public class Main
     {
         RegularSeason season2018 = new RegularSeason();
 
-        SR_API_Configuration srApiConfiguration = SR_API_Configuration.getInstance();
-
         JsonResponse response = null;
         try
         {
-            response = JsonRestMessenger.get(srApiConfiguration.getRegularSeasonScheduleUrl());
+            response = JsonRestMessenger.get(SR_API_CONFIGURATION.getRegularSeasonScheduleUrl());
         } catch (IOException e)
         {
             e.printStackTrace();
@@ -132,5 +137,34 @@ public class Main
         }
 
         return season2018;
+    }
+
+    private static Team initializeTeam(String teamAbbreviation)
+    {
+        try
+        {
+            Thread.sleep(1000);
+        } catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+
+        Team team = null;
+
+        JsonResponse response = null;
+        try
+        {
+            response = JsonRestMessenger.get(SR_API_CONFIGURATION.getTeamRoster(teamAbbreviation));
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        if (response != null)
+        {
+            team = new Gson().fromJson(response.getResponseJSON(), Team.class);
+        }
+
+        return team;
     }
 }

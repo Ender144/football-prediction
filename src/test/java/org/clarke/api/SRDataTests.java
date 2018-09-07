@@ -2,8 +2,8 @@ package org.clarke.api;
 
 import com.google.gson.Gson;
 import org.clarke.configuration.SR_API_Configuration;
-import org.clarke.seasonModel.Game;
-import org.clarke.seasonModel.RegularSeason;
+import org.clarke.regularSeasonModel.Game;
+import org.clarke.regularSeasonModel.RegularSeason;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
