@@ -74,23 +74,23 @@ public class Game implements Comparable<Game>
 
     public int getOurScore()
     {
-        boolean michiganIsAway = away.equals("mich");
-        if (away_points == null || home_points == null)
-        {
-            return -1;
-        }
-
-        return michiganIsAway ? Integer.parseInt(home_points) : Integer.parseInt(away_points);
-    }
-
-    public int getTheirScore()
-    {
-        boolean michiganIsAway = away.equals("mich");
+        boolean michiganIsAway = away.equalsIgnoreCase("mich");
         if (away_points == null || home_points == null)
         {
             return -1;
         }
 
         return michiganIsAway ? Integer.parseInt(away_points) : Integer.parseInt(home_points);
+    }
+
+    public int getTheirScore()
+    {
+        boolean michiganIsAway = away.equalsIgnoreCase("mich");
+        if (away_points == null || home_points == null)
+        {
+            return -1;
+        }
+
+        return michiganIsAway ? Integer.parseInt(home_points) : Integer.parseInt(away_points);
     }
 }
