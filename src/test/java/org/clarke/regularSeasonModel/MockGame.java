@@ -22,7 +22,7 @@ class MockGame extends Game
         away_points = String.valueOf(score);
     }
 
-    void setScheduled(String scheduled)
+    public void setScheduled(String scheduled)
     {
         this.scheduled = scheduled;
     }

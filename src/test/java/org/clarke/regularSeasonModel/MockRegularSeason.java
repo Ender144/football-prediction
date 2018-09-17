@@ -26,16 +26,16 @@ public class MockRegularSeason extends RegularSeason
 
         mockGames.add(mockGame);
         mockGames.add(mockWMCGame);
-        mockGames.add(getUnplayedGame("12"));
-        mockGames.add(getUnplayedGame("13"));
-        mockGames.add(getUnplayedGame("14"));
-        mockGames.add(getUnplayedGame("15"));
-        mockGames.add(getUnplayedGame("16"));
-        mockGames.add(getUnplayedGame("17"));
-        mockGames.add(getUnplayedGame("18"));
-        mockGames.add(getUnplayedGame("19"));
-        mockGames.add(getUnplayedGame("20"));
-        mockGames.add(getUnplayedGame("21"));
+        mockGames.add(getUnplayedGame("SMU", 12));
+        mockGames.add(getUnplayedGame("NEB", 13));
+        mockGames.add(getUnplayedGame("NW", 14));
+        mockGames.add(getUnplayedGame("PSU", 15));
+        mockGames.add(getUnplayedGame("MAR", 16));
+        mockGames.add(getUnplayedGame("MSU", 17));
+        mockGames.add(getUnplayedGame("IU", 18));
+        mockGames.add(getUnplayedGame("OSU", 19));
+        mockGames.add(getUnplayedGame("RUT", 20));
+        mockGames.add(getUnplayedGame("WIS", 21));
 
         return mockGames;
     }
@@ -46,7 +46,7 @@ public class MockRegularSeason extends RegularSeason
         return "TestSeason2018";
     }
 
-    private Game getUnplayedGame(String opponent)
+    private Game getUnplayedGame(String opponent, int day)
     {
         MockGame unplayed = new MockGame();
 
@@ -54,7 +54,7 @@ public class MockRegularSeason extends RegularSeason
         unplayed.setTheirScore(-1);
         unplayed.setOurTeam("mich");
         unplayed.setOurScore(-1);
-        unplayed.setScheduled("2018-09-" + opponent + "T");
+        unplayed.setScheduled("2018-09-" + day + "T");
 
         return unplayed;
     }

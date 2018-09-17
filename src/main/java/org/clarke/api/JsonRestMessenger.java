@@ -7,6 +7,8 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -16,6 +18,8 @@ import java.util.stream.Collectors;
 
 public class JsonRestMessenger
 {
+    private static final Logger logger = LoggerFactory.getLogger(JsonRestMessenger.class);
+    
     private static ResponseHandler<JsonResponse> responseHandler = new JsonResponseHandler();
     private static Executor authExecutor = Executor.newInstance();
 
@@ -34,7 +38,7 @@ public class JsonRestMessenger
 
     public static JsonResponse get(String url) throws IOException
     {
-        System.out.println("Fetching URL with GET: " + url);
+        logger.info("Fetching URL with GET: " + url);
         return authExecutor.execute(
             Request.Get(url)
         ).handleResponse(responseHandler);
@@ -54,8 +58,8 @@ public class JsonRestMessenger
         try
         {
             URI uri = new URI("http", null, address, 80, path, null, null);
-            System.out.println("URI: " + uri.toURL().toExternalForm());
-            System.out.println("Body: " + bodyString);
+            logger.info("URI: " + uri.toURL().toExternalForm());
+            logger.info("Body: " + bodyString);
             response = authExecutor.execute(
                 Request.Post(uri).bodyString(bodyString, contentType)
             ).handleResponse(responseHandler);

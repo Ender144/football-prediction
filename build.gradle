@@ -15,12 +15,29 @@ repositories {
 }
 
 dependencies {
+    compile 'ch.qos.logback:logback-classic:1.2.3'
+    compile 'ch.qos.logback:logback-core:1.2.3'
+//    compile 'com.google.api-client:google-api-client:1.25.0'
+//    compile 'com.google.api-client:google-api-client-appengine:1.25.0'
+//    compile 'com.google.api-client:google-api-client-servlet:1.25.0'
+//    compile 'com.google.http-client:google-http-client-appengine:1.25.0'
+//    compile 'com.google.oauth-client:google-oauth-client:1.25.0'
+//    compile 'com.google.oauth-client:google-oauth-client-jetty:1.25.0'
+//    compile 'com.google.oauth-client:google-oauth-client-appengine:1.25.0'
+////    compile 'com.google.apis:google-api-services-sheets:v4-rev539-1.25.0'
+//    compile group: 'com.google.appengine', name: 'appengine-api-1.0-sdk', version: '1.9.64'
+//    compile group: 'com.google.appengine', name: 'appengine-api-labs', version: '1.9.64'
     compile 'com.google.code.gson:gson:2.8.5'
     compile 'org.apache.commons:commons-lang3:3.8'
     compile 'org.apache.httpcomponents:fluent-hc:4.5.6'
     compile 'org.apache.httpcomponents:httpclient:4.5.6'
     compile 'org.apache.poi:poi-ooxml:3.17'
+    compile 'org.hibernate:hibernate-core:5.3.6.Final'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+    compile group: 'postgresql', name: 'postgresql', version: '9.1-901-1.jdbc4'
 
+//    testCompile group: 'com.google.appengine', name: 'appengine-testing', version: '1.9.64'
+//    testCompile group: 'com.google.appengine', name: 'appengine-api-stubs', version: '1.9.64'
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.0'
 
     testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.0'

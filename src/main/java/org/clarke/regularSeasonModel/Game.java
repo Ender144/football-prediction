@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class Game implements Comparable<Game>
 {
     protected String scheduled;
@@ -92,5 +93,145 @@ public class Game implements Comparable<Game>
         }
 
         return michiganIsAway ? Integer.parseInt(home_points) : Integer.parseInt(away_points);
+    }
+
+    public String getAway()
+    {
+        return away;
+    }
+
+    public void setAway(String away)
+    {
+        this.away = away;
+    }
+
+    public String getAway_points()
+    {
+        return away_points;
+    }
+
+    public void setAway_points(String away_points)
+    {
+        this.away_points = away_points;
+    }
+
+    public String getAway_rotation()
+    {
+        return away_rotation;
+    }
+
+    public void setAway_rotation(String away_rotation)
+    {
+        this.away_rotation = away_rotation;
+    }
+
+    public Broadcast getBroadcast()
+    {
+        return broadcast;
+    }
+
+    public void setBroadcast(Broadcast broadcast)
+    {
+        this.broadcast = broadcast;
+    }
+
+    public String getCoverage()
+    {
+        return coverage;
+    }
+
+    public void setCoverage(String coverage)
+    {
+        this.coverage = coverage;
+    }
+
+    public String getHome()
+    {
+        return home;
+    }
+
+    public void setHome(String home)
+    {
+        this.home = home;
+    }
+
+    public String getHome_points()
+    {
+        return home_points;
+    }
+
+    public void setHome_points(String home_points)
+    {
+        this.home_points = home_points;
+    }
+
+    public String getHome_rotation()
+    {
+        return home_rotation;
+    }
+
+    public void setHome_rotation(String home_rotation)
+    {
+        this.home_rotation = home_rotation;
+    }
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
+    public String getNeutral_site()
+    {
+        return neutral_site;
+    }
+
+    public void setNeutral_site(String neutral_site)
+    {
+        this.neutral_site = neutral_site;
+    }
+
+    public String getScheduled()
+    {
+        return scheduled;
+    }
+
+    public void setScheduled(String scheduled)
+    {
+        this.scheduled = scheduled;
+    }
+
+    public String getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(String status)
+    {
+        this.status = status;
+    }
+
+    public Venue getVenue()
+    {
+        return venue;
+    }
+
+    public void setVenue(Venue venue)
+    {
+        this.venue = venue;
+    }
+
+    public Weather getWeather()
+    {
+        return weather;
+    }
+
+    public void setWeather(Weather weather)
+    {
+        this.weather = weather;
     }
 }

@@ -3,6 +3,7 @@ package org.clarke.regularSeasonModel;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class RegularSeason
 {
     private String season;
@@ -40,5 +41,25 @@ public class RegularSeason
     public List<Week> getWeeks()
     {
         return weeks;
+    }
+
+    public String getType()
+    {
+        return type;
+    }
+
+    public void setType(String type)
+    {
+        this.type = type;
+    }
+
+    public void setSeason(String season)
+    {
+        this.season = season;
+    }
+
+    public void setWeeks(List<Week> weeks)
+    {
+        this.weeks = weeks;
     }
 }

@@ -5,12 +5,15 @@ import org.clarke.api.JsonResponse;
 import org.clarke.api.JsonRestMessenger;
 import org.clarke.configuration.Configuration;
 import org.clarke.configuration.SR_API_Configuration;
+import org.clarke.database.DBConnection;
 import org.clarke.predictionModel.ParticipantScores;
 import org.clarke.predictionModel.PredictedScore;
 import org.clarke.predictionModel.SeasonPrediction;
 import org.clarke.regularSeasonModel.Game;
 import org.clarke.regularSeasonModel.RegularSeason;
 import org.clarke.rosterModel.Team;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,7 +26,14 @@ import java.util.TreeMap;
 public class Main
 {
     public static final List<String> participants = new ArrayList<>();
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
     private static final String PREDICTIONS_CONFIG = "predictions.properties";
+    private static final String DATABASE_CONFIG = "database.properties";
+    private static final SR_API_Configuration SR_API_CONFIGURATION = SR_API_Configuration.getInstance();
+    private static DBConnection dbConnection = DBConnection.getInstance();
+
+    private static boolean overwriteSeason;
+    private static boolean overwriteTeams;
 
     static
     {
@@ -35,9 +45,11 @@ public class Main
         participants.add("Britt");
         participants.add("Tyler");
         participants.add("Heather");
-    }
 
-    private static final SR_API_Configuration SR_API_CONFIGURATION = SR_API_Configuration.getInstance();
+        Configuration dbConfig = new Configuration(DATABASE_CONFIG);
+        overwriteSeason = dbConfig.getBooleanValue("overwriteSeason", false);
+        overwriteTeams = dbConfig.getBooleanValue("overwriteTeams", false);
+    }
 
     public static List<SeasonPrediction> initializePredictionModel(RegularSeason regularSeason)
     {
@@ -53,7 +65,7 @@ public class Main
 
             if (configuredPredictedScores.size() != michiganGames.size())
             {
-                System.err.println(participant + " has not predicted scores for all games!");
+                logger.error(participant + " has not predicted scores for all games!");
                 break;
             } else
             {
@@ -63,7 +75,7 @@ public class Main
                     String[] scores = configuredPredictedScore.split("-");
                     if (scores.length != 2)
                     {
-                        System.err.println(participant + " has not predicted both teams' scores for a game (missing dash?)");
+                        logger.error(participant + " has not predicted both teams' scores for a game (missing dash?)");
                     } else
                     {
                         try
@@ -75,7 +87,7 @@ public class Main
                             predictedScores.put(predictedGame, new PredictedScore(ourScore, theirScore));
                         } catch (NumberFormatException nfe)
                         {
-                            System.err.println("One of " + participant + "\'s predicted scores was not a number!");
+                            logger.error("One of " + participant + "\'s predicted scores was not a number!");
                             nfe.printStackTrace();
                         }
                     }
@@ -90,6 +102,59 @@ public class Main
         return seasonPredictions;
     }
 
+    @SuppressWarnings("WeakerAccess")
+    public static RegularSeason initializeSeasonModel()
+    {
+        RegularSeason season2018;
+        String connectionOutcome = dbConnection.connect();
+
+        if (overwriteSeason)
+        {
+            logger.info("Overwriting DB Season via configuration...");
+            season2018 = loadSeasonFromAPI();
+        } else if (!connectionOutcome.isEmpty())
+        {
+            logger.error("Database could not connect... " + connectionOutcome);
+            season2018 = loadSeasonFromAPI();
+        } else
+        {
+            season2018 = dbConnection.getRegularSeason("2018");
+            if (season2018 == null)
+            {
+                logger.info("Season not initialized in DB...");
+                season2018 = loadSeasonFromAPI();
+            }
+        }
+
+        return season2018;
+    }
+
+    public static Team initializeTeam(String teamAbbreviation)
+    {
+        Team team;
+        String connectionOutcome = dbConnection.connect();
+
+        if (overwriteTeams)
+        {
+            logger.info("Overwriting DB Season via configuration...");
+            team = loadTeamFromAPI(teamAbbreviation);
+        } else if (!connectionOutcome.isEmpty())
+        {
+            logger.error("Database could not connect... " + connectionOutcome);
+            team = loadTeamFromAPI(teamAbbreviation);
+        } else
+        {
+            team = dbConnection.getTeam(teamAbbreviation);
+            if (team == null)
+            {
+                logger.info("Team not initialized in DB...");
+                team = loadTeamFromAPI(teamAbbreviation);
+            }
+        }
+
+        return team;
+    }
+
     public static void main(String[] args)
     {
         RegularSeason season2018 = initializeSeasonModel();
@@ -100,15 +165,15 @@ public class Main
 
         ParticipantScores scores = new ParticipantScores(seasonPredictions, season2018);
 
-        System.out.println();
         seasonPredictions.forEach(System.out::println);
 
         for (String participant : participants)
         {
             System.out.println(participant + " current score: " + scores.getCurrentParticipantScore(participant));
+            logger.info(participant + " current score: " + scores.getCurrentParticipantScore(participant));
         }
 
-        System.out.println("Printing excel sheet...");
+        logger.info("Printing excel sheet...");
         try
         {
             ExcelSeasonOutput.printExcelSheet(season2018, seasonPredictions, opponents);
@@ -116,10 +181,23 @@ public class Main
         {
             e.printStackTrace();
         }
+        logger.info("Finished writing excel sheet...");
+        System.out.println("Finished writing excel sheet...");
+        System.exit(0);
+
+        //        logger.info("Grabbing google sheet...");
+        //        try
+        //        {
+        //            new GoogleSheetsConfiguration().retrieveSheet();
+        //        } catch (IOException | GeneralSecurityException e)
+        //        {
+        //            e.printStackTrace();
+        //        }
     }
 
-    private static RegularSeason initializeSeasonModel()
+    private static RegularSeason loadSeasonFromAPI()
     {
+        logger.info("Loading season from API...");
         RegularSeason season2018 = new RegularSeason();
 
         JsonResponse response = null;
@@ -136,11 +214,14 @@ public class Main
             season2018 = new Gson().fromJson(response.getResponseJSON(), RegularSeason.class);
         }
 
+        dbConnection.addRegularSeason(season2018);
+
         return season2018;
     }
 
-    private static Team initializeTeam(String teamAbbreviation)
+    private static Team loadTeamFromAPI(String teamAbbreviation)
     {
+        logger.info("Loading Team from API...");
         try
         {
             Thread.sleep(1000);
@@ -164,6 +245,8 @@ public class Main
         {
             team = new Gson().fromJson(response.getResponseJSON(), Team.class);
         }
+
+        dbConnection.addTeam(team);
 
         return team;
     }

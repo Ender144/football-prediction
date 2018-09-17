@@ -1,17 +1,71 @@
-package org.clarke.regularSeasonModel;
+package org.clarke.database.regularSeasonModel;
 
-@SuppressWarnings("unused")
-public class Venue
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
+
+@Entity
+@SuppressWarnings({"WeakerAccess", "unused"})
+@Table(schema = "regular_season", name = "Venue", uniqueConstraints = {@UniqueConstraint(columnNames = "venue_id")})
+public class DbVenue
 {
+    @Transient
+    public static final String ID = "venue_id";
+    @Transient
+    public static final String COUNTRY = "country";
+    @Transient
+    public static final String NAME = "name";
+    @Transient
+    public static final String CITY = "city";
+    @Transient
+    public static final String STATE = "state";
+    @Transient
+    public static final String CAPACITY = "capacity";
+    @Transient
+    public static final String TYPE = "type";
+    @Transient
+    public static final String ZIP = "zip";
+    @Transient
+    public static final String ADDRESS = "address";
+
+    @Id
+    @Column(name = ID)
     private String id;
+
+    @Column(name = COUNTRY)
     private String country;
+
+    @Column(name = NAME)
     private String name;
+
+    @Column(name = CITY)
     private String city;
+
+    @Column(name = STATE)
     private String state;
+
+    @Column(name = CAPACITY)
     private String capacity;
+
+    @Column(name = TYPE)
     private String type;
+
+    @Column(name = ZIP)
     private String zip;
+
+    @Column(name = ADDRESS)
     private String address;
+
+    @OneToOne(mappedBy = "dbVenue", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private DbGame dbGame;
+
+    public DbVenue() {}
 
     public String getAddress()
     {

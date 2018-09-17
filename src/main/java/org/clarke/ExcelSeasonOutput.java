@@ -17,6 +17,8 @@ import org.clarke.predictionModel.SeasonPrediction;
 import org.clarke.regularSeasonModel.Game;
 import org.clarke.regularSeasonModel.RegularSeason;
 import org.clarke.rosterModel.Team;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.Color;
 import java.io.FileOutputStream;
@@ -31,6 +33,7 @@ import java.util.TreeMap;
 
 public class ExcelSeasonOutput
 {
+    private static final Logger logger = LoggerFactory.getLogger(ExcelSeasonOutput.class);
     private static final String SHEET_SUFFIX = " Michigan Prediction";
     private static final String TITLE_SUFFIX = " Michigan Prediction Results";
 
@@ -46,18 +49,27 @@ public class ExcelSeasonOutput
         String sheetName = season.getSeason();
         String fileName = sheetName + SHEET_SUFFIX + ".xlsx";
         String title = sheetName + TITLE_SUFFIX;
+        logger.info("Preparing to write " + fileName);
 
         ParticipantScores scores = new ParticipantScores(predictions, season);
 
         XSSFSheet sheet = workbook.createSheet(sheetName);
 
+        logger.info("Writing title row...");
         writeTitleRow(sheet, title, rowNumber++);
+        logger.info("Writing names row...");
         writeNamesRow(sheet, predictions, rowNumber++);
+        logger.info("Writing headers row...");
         writeHeadersRow(sheet, predictions, rowNumber++);
 
         LocalDate lastGameDay = LocalDate.MIN, nextGameDay;
         for (Game game : season.getMichiganGamesThisSeason())
         {
+            if (opponents.get(game.them()) != null)
+            {
+                logger.info("Writing game row for " + opponents.get(game.them()).getFullTeamName());
+            }
+
             nextGameDay = game.getDate();
 
             if (!lastGameDay.isEqual(LocalDate.MIN) && !lastGameDay.plusDays(7).isEqual(nextGameDay))
@@ -69,9 +81,11 @@ public class ExcelSeasonOutput
         }
 
         rowNumber++;
+        logger.info("Writing results row...");
         writeResultsRow(sheet, predictions, scores, rowNumber);
 
         rowNumber += 2;
+        logger.info("Writing current standings...");
         writeCurrentStandings(sheet, predictions, scores, rowNumber);
 
         for (int i = 0; i < predictions.size() * 4 + 7; i++)
@@ -79,10 +93,12 @@ public class ExcelSeasonOutput
             sheet.autoSizeColumn(i);
         }
 
+        logger.info("Saving file...");
         FileOutputStream fileOutputStream = new FileOutputStream(fileName);
         workbook.write(fileOutputStream);
         fileOutputStream.flush();
         fileOutputStream.close();
+        logger.info("File saved...");
     }
 
     private static void styleStripe(XSSFCell cell)

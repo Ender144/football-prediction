@@ -24,7 +24,7 @@ class SRDataTests
             for (Game game : michiganGames)
             {
                 int michiganPoints = game.getOurScore();
-                System.out.println("Game: Home:" + game.getHomeTeam() + ", Away: " + game.getAwayTeam() + ", Mich points: " + michiganPoints);
+                System.out.println("DbGame: Home:" + game.getHomeTeam() + ", Away: " + game.getAwayTeam() + ", Mich points: " + michiganPoints);
             }
         } catch (IOException e)
         {

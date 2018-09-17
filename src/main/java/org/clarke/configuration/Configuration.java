@@ -1,5 +1,8 @@
 package org.clarke.configuration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -18,6 +21,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class Configuration
 {
+    private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
     public static final String DEFAULT_CONF_DIR = "conf";
     public static final String DEFAULT_MAP_REGEX_DELIMITER = "@";
     public static final String DEV_CONFIG_ENV_VAR = "DEV_CONFIG";
@@ -56,12 +60,12 @@ public class Configuration
 
         if (property == null)
         {
-            System.out.println("info> Falling back to default value for " + key + ": " + defaultValue + ".");
+            logger.info("info> Falling back to default value for " + key + ": " + defaultValue + ".");
             returnValue = defaultValue;
         } else
         {
             returnValue = Boolean.parseBoolean(property);
-            System.out.println("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + returnValue);
+            logger.info("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + returnValue);
         }
 
         return returnValue;
@@ -75,12 +79,12 @@ public class Configuration
 
         if (property == null)
         {
-            System.out.println("info> Falling back to default value for " + key + ": " + Arrays.toString(defaultValue) + ".");
+            logger.info("info> Falling back to default value for " + key + ": " + Arrays.toString(defaultValue) + ".");
             returnValue = defaultValue;
         } else
         {
             returnValue = property.split(",");
-            System.out.println("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + Arrays.toString(returnValue));
+            logger.info("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + Arrays.toString(returnValue));
         }
 
         return returnValue;
@@ -93,13 +97,13 @@ public class Configuration
 
         if (property == null)
         {
-            System.out.println("info> Falling back to default value for " + key + ": " + Arrays.toString(defaultValue.toArray()) + ".");
+            logger.info("info> Falling back to default value for " + key + ": " + Arrays.toString(defaultValue.toArray()) + ".");
             returnValue = defaultValue;
         } else
         {
             returnValue = Arrays.stream(property.split(",")).map(Boolean::parseBoolean).collect(Collectors.toList());
 
-            System.out.println("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + Arrays.toString(returnValue.toArray()));
+            logger.info("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + Arrays.toString(returnValue.toArray()));
         }
 
         return returnValue;
@@ -112,7 +116,7 @@ public class Configuration
 
         if (property == null)
         {
-            System.out.println("info> Falling back to default value for " + key + ": " + Arrays.toString(defaultValue.toArray()) + ".");
+            logger.info("info> Falling back to default value for " + key + ": " + Arrays.toString(defaultValue.toArray()) + ".");
             returnValue = defaultValue;
         } else
         {
@@ -122,10 +126,10 @@ public class Configuration
                 Arrays.stream(property.split(",")).map(Double::parseDouble).forEach(returnValue::add);
             } catch (NumberFormatException nfe)
             {
-                System.out.println("info> A list element was not an integer. Falling back to default value for " + key + ": " + defaultValue + ".");
+                logger.info("info> A list element was not an integer. Falling back to default value for " + key + ": " + defaultValue + ".");
             }
 
-            System.out.println("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + Arrays.toString(returnValue.toArray()));
+            logger.info("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + Arrays.toString(returnValue.toArray()));
         }
 
         return returnValue;
@@ -138,7 +142,7 @@ public class Configuration
 
         if (property == null)
         {
-            System.out.println("info> Falling back to default value for " + key + ": " + Arrays.toString(defaultValue.toArray()) + ".");
+            logger.info("info> Falling back to default value for " + key + ": " + Arrays.toString(defaultValue.toArray()) + ".");
             returnValue = defaultValue;
         } else
         {
@@ -148,10 +152,10 @@ public class Configuration
                 Arrays.stream(property.split(",")).map(Integer::parseInt).forEach(returnValue::add);
             } catch (NumberFormatException nfe)
             {
-                System.out.println("info> A list element was not an integer. Falling back to default value for " + key + ": " + defaultValue + ".");
+                logger.info("info> A list element was not an integer. Falling back to default value for " + key + ": " + defaultValue + ".");
             }
 
-            System.out.println("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + Arrays.toString(returnValue.toArray()));
+            logger.info("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + Arrays.toString(returnValue.toArray()));
         }
 
         return returnValue;
@@ -164,12 +168,12 @@ public class Configuration
 
         if (property == null)
         {
-            System.out.println("info> Falling back to default value for " + key + ": " + Arrays.toString(defaultValue.toArray()) + ".");
+            logger.info("info> Falling back to default value for " + key + ": " + Arrays.toString(defaultValue.toArray()) + ".");
             returnValue = defaultValue;
         } else
         {
             returnValue = Arrays.asList(property.split(","));
-            System.out.println("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + Arrays.toString(returnValue.toArray()));
+            logger.info("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + Arrays.toString(returnValue.toArray()));
         }
 
         return returnValue;
@@ -183,10 +187,10 @@ public class Configuration
         try
         {
             returnValue = Double.parseDouble(property);
-            System.out.println("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + returnValue);
+            logger.info("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + returnValue);
         } catch (NumberFormatException nfe)
         {
-            System.out.println("info> Falling back to default value for " + key + ": " + defaultValue + ".");
+            logger.info("info> Falling back to default value for " + key + ": " + defaultValue + ".");
             returnValue = defaultValue;
         }
 
@@ -201,10 +205,10 @@ public class Configuration
         try
         {
             returnValue = Integer.parseInt(property);
-            System.out.println("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + returnValue);
+            logger.info("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + returnValue);
         } catch (NumberFormatException nfe)
         {
-            System.out.println("info> Falling back to default value for " + key + ": " + defaultValue + ".");
+            logger.info("info> Falling back to default value for " + key + ": " + defaultValue + ".");
             returnValue = defaultValue;
         }
 
@@ -228,7 +232,7 @@ public class Configuration
 
         if (property == null)
         {
-            System.out.println("info> Falling back to default value for " + key + ": ");
+            logger.info("info> Falling back to default value for " + key + ": ");
             defaultValue.forEach((k, v) -> System.out.print("{" + k + " : " + v + "}, "));
             returnValue = defaultValue;
         } else
@@ -267,11 +271,11 @@ public class Configuration
         String property = getProperty(key);
         if (property == null)
         {
-            System.out.println("info> Falling back to default value for " + key + ": " + defaultValue + ".");
+            logger.info("info> Falling back to default value for " + key + ": " + defaultValue + ".");
             property = defaultValue;
         } else
         {
-            System.out.println("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + property);
+            logger.info("info> " + propertiesName + " configured the \"" + key + "\" property with value: " + property);
         }
 
         return property;
@@ -287,7 +291,7 @@ public class Configuration
         String property = properties.getProperty(key);
         if (property == null)
         {
-            System.out.println("info> " + propertiesName + " did not have the \"" + key + "\" property.");
+            logger.info("info> " + propertiesName + " did not have the \"" + key + "\" property.");
         }
 
         return property;
@@ -295,34 +299,34 @@ public class Configuration
 
     private void initializeProperties()
     {
-        System.out.println("info> Finding configured properties...");
+        logger.info("info> Finding configured properties...");
         String environmentVariableValue = System.getenv(environmentVariable);
         String propertiesFolder;
 
         if (environmentVariableValue == null)
         {
             propertiesFolder = confDir;
-            System.out.println("info> \"" + environmentVariable + "\" environment variable not found. Using \"" + confDir + "\" directory.");
+            logger.info("info> \"" + environmentVariable + "\" environment variable not found. Using \"" + confDir + "\" directory.");
         } else
         {
             if (environmentVariableValue.endsWith(propertiesName))
             {
-                System.out.println("info> \"" + environmentVariable + "\" environment variable points to a properties file.");
+                logger.info("info> \"" + environmentVariable + "\" environment variable points to a properties file.");
                 propertiesFolder = environmentVariableValue.substring(0, environmentVariableValue.lastIndexOf(File.separator));
             } else
             {
                 File valueFile = new File(environmentVariableValue);
                 if (valueFile.isDirectory())
                 {
-                    System.out.println("info> \"" + environmentVariable + "\" environment variable points to a directory.");
+                    logger.info("info> \"" + environmentVariable + "\" environment variable points to a directory.");
                     propertiesFolder = environmentVariableValue;
                 } else
                 {
-                    System.out.println("info> \"" + environmentVariable + "\" environment variable does not point to a directory or a properties file.");
+                    logger.info("info> \"" + environmentVariable + "\" environment variable does not point to a directory or a properties file.");
                     propertiesFolder = confDir;
                 }
 
-                System.out.println("info> Checking folder \"" + propertiesFolder + "\" for configuration of properties...");
+                logger.info("info> Checking folder \"" + propertiesFolder + "\" for configuration of properties...");
             }
         }
 
@@ -334,7 +338,7 @@ public class Configuration
             loadedProps = true;
         } catch (IOException ioe)
         {
-            System.out.println("info> Failed to open configuration properties " + propertiesName +
+            logger.info("info> Failed to open configuration properties " + propertiesName +
                 " from external file (" + ioe.getMessage() + ").");
         }
 
@@ -346,7 +350,7 @@ public class Configuration
                 loadedProps = true;
             } catch (IOException ioe)
             {
-                System.out.println("info> Failed to open configuration properties " + propertiesName +
+                logger.info("info> Failed to open configuration properties " + propertiesName +
                     " from folder in jar (" + ioe.getMessage() + ").");
             }
         }
@@ -359,14 +363,14 @@ public class Configuration
                 loadedProps = true;
             } catch (IOException ioe)
             {
-                System.out.println("info> Failed to open configuration properties " + propertiesName +
+                logger.info("info> Failed to open configuration properties " + propertiesName +
                     " from jar root (" + ioe.getMessage() + ").");
             }
         }
 
         if (!loadedProps)
         {
-            System.out.println("ERROR> Failed to open configuration properties " + propertiesName +
+            logger.info("ERROR> Failed to open configuration properties " + propertiesName +
                 ". This configuration will always return default values!");
         }
     }
