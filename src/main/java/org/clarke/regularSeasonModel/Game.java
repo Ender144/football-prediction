@@ -35,6 +35,16 @@ public class Game implements Comparable<Game>
         return away.equalsIgnoreCase("mich") ? home : away;
     }
 
+    public String getThem()
+    {
+        return them();
+    }
+
+    public String getUs()
+    {
+        return us();
+    }
+
     public String us()
     {
         return away.equalsIgnoreCase("mich") ? away : home;

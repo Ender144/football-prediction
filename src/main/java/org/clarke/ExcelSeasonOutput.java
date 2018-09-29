@@ -1,6 +1,7 @@
 package org.clarke;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -268,6 +269,8 @@ public class ExcelSeasonOutput
 
             weeklyScore = gameRow.createCell(cellIndex++);
             styleStripe(weeklyScore);
+            XSSFCellStyle style = weeklyScore.getCellStyle();
+            style.setBorderLeft(BorderStyle.MEDIUM);
             weeklyScore.setCellValue(scores.getScoreForGame(game, prediction.getParticipant()));
 
             predictedOutcome = gameRow.createCell(cellIndex++);
@@ -314,6 +317,9 @@ public class ExcelSeasonOutput
             cellIndex += 2;
             XSSFCell blankStripe = columnHeadersRow.createCell(cellIndex - 1);
             styleStripe(blankStripe);
+            XSSFCellStyle style = blankStripe.getCellStyle();
+            style.setBorderLeft(BorderStyle.MEDIUM);
+
             XSSFCell predictedOutcomeCell = columnHeadersRow.createCell(cellIndex);
             styleStripe(predictedOutcomeCell);
             predictedOutcomeCell.setCellValue("Outcome");
@@ -344,6 +350,8 @@ public class ExcelSeasonOutput
             // Users start in col 8, zero indexed
             XSSFCell weeklyResultCell = namesRow.createCell(cellIndex);
             styleStripe(weeklyResultCell);
+            XSSFCellStyle style = weeklyResultCell.getCellStyle();
+            style.setBorderLeft(BorderStyle.MEDIUM);
             weeklyResultCell.setCellValue(WEEKLY_RESULT);
 
             XSSFCell blankStripe1 = namesRow.createCell(cellIndex + 1);

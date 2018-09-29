@@ -6,12 +6,15 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.clarke.regularSeasonModel.Game;
+import org.clarke.rosterModel.Opponent;
 
 import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class TeamColorsManager
@@ -21,6 +24,7 @@ public class TeamColorsManager
     private static TeamColorsManager instance;
 
     private Map<String, Pair<Color, Color>> teamColorMap = new HashMap<>();
+    private Map<String, Pair<String, String>> hexTeamColorMap = new HashMap<>();
 
     private TeamColorsManager()
     {
@@ -40,6 +44,25 @@ public class TeamColorsManager
     public Pair<Color, Color> getTeamColors(String teamName)
     {
         return teamColorMap.get(teamName.toLowerCase());
+    }
+
+    public Pair<String, String> getOpponentColors(Game game, List<Opponent> opponents)
+    {
+        String teamName = "none";
+        Opponent indexOpponent = new Opponent(game.them(), null);
+
+        if (opponents != null)
+        {
+            Opponent gameOpponent = opponents.get(opponents.indexOf(indexOpponent));
+
+            if (gameOpponent != null)
+            {
+                teamName = gameOpponent.getTeam().getFullTeamName().toLowerCase();
+            }
+        }
+
+        Pair<String, String> hexColors = hexTeamColorMap.get(teamName);
+        return hexColors == null ? Pair.of("#ffffff", "#000000") : hexColors;
     }
 
     private void parseColors()
@@ -84,6 +107,7 @@ public class TeamColorsManager
                         }
 
                         teamColorMap.put(teamName, Pair.of(Color.decode(primaryColor), Color.decode(secondaryColor)));
+                        hexTeamColorMap.put(teamName, Pair.of(primaryColor, secondaryColor));
                     }
                 }
             }

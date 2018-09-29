@@ -106,15 +106,14 @@ public class Main
     public static RegularSeason initializeSeasonModel()
     {
         RegularSeason season2018;
-        String connectionOutcome = dbConnection.connect();
 
         if (overwriteSeason)
         {
             logger.info("Overwriting DB Season via configuration...");
             season2018 = loadSeasonFromAPI();
-        } else if (!connectionOutcome.isEmpty())
+        } else if (!dbConnection.connect().isEmpty())
         {
-            logger.error("Database could not connect... " + connectionOutcome);
+            logger.error("Database could not connect... ");
             season2018 = loadSeasonFromAPI();
         } else
         {

@@ -31,24 +31,38 @@ public class ParticipantScores
 
         if (game.getTheirScore() != -1 && game.getOurScore() != -1 && participantPrediction != null)
         {
-            Pair<Integer, Integer> minimumPointsDifferences = getMinimumPointDifferences(game);
-            int minimumOurPointsDifference = minimumPointsDifferences.getLeft();
-            int minimumTheirPointsDifference = minimumPointsDifferences.getRight();
+            score += predictedCorrectOutcome(participantPrediction, game) ?
+                MetricWeights.SAME_OUTCOME.getWeight() :
+                MetricWeights.DIFFERENT_OUTCOMES.getWeight();
 
-            score += getParticipantOutcomeScore(game, participant);
-
-            if (minimumOurPointsDifference == Math.abs(participantPrediction.getGamePrediction(game).getOurScore() - game.getOurScore()))
+            if (participantIsClosestToUs(participantPrediction, game))
             {
                 score += MetricWeights.CLOSEST_OUR_SCORE.getWeight();
             }
 
-            if (minimumTheirPointsDifference == Math.abs(participantPrediction.getGamePrediction(game).getTheirScore() - game.getTheirScore()))
+            if (participantIsClosestToThem(participantPrediction, game))
             {
                 score += MetricWeights.CLOSEST_THEIR_SCORE.getWeight();
             }
         }
 
         return score;
+    }
+
+    public boolean participantIsClosestToThem(SeasonPrediction participantPrediction, Game game)
+    {
+        Pair<Integer, Integer> minimumPointsDifferences = getMinimumPointDifferences(game);
+        int minimumTheirPointsDifference = minimumPointsDifferences.getRight();
+
+        return minimumTheirPointsDifference == Math.abs(participantPrediction.getGamePrediction(game).getTheirScore() - game.getTheirScore());
+    }
+
+    public boolean participantIsClosestToUs(SeasonPrediction participantPrediction, Game game)
+    {
+        Pair<Integer, Integer> minimumPointsDifferences = getMinimumPointDifferences(game);
+        int minimumOurPointsDifference = minimumPointsDifferences.getLeft();
+
+        return minimumOurPointsDifference == Math.abs(participantPrediction.getGamePrediction(game).getOurScore() - game.getOurScore());
     }
 
     private Pair<Integer, Integer> getMinimumPointDifferences(Game game)
@@ -67,20 +81,17 @@ public class ParticipantScores
         return Pair.of(minimumOurScoreDifference, minimumTheirScoreDifference);
     }
 
-    private int getParticipantOutcomeScore(Game game, String participant)
+    public boolean predictedCorrectOutcome(SeasonPrediction participantPrediction, Game game)
     {
-        SeasonPrediction participantPrediction = getParticipantPrediction(participant);
         if (participantPrediction != null)
         {
-            Outcome predictedOutcome = getParticipantPrediction(participant).getGamePrediction(game).getPredictedOutcome();
+            Outcome predictedOutcome = participantPrediction.getGamePrediction(game).getPredictedOutcome();
             Outcome actualOutcome = game.getActualOutcome();
 
-            return predictedOutcome == actualOutcome ?
-                MetricWeights.SAME_OUTCOME.getWeight() :
-                MetricWeights.DIFFERENT_OUTCOMES.getWeight();
+            return predictedOutcome == actualOutcome;
         }
 
-        return MetricWeights.DIFFERENT_OUTCOMES.getWeight();
+        return false;
     }
 
     private SeasonPrediction getParticipantPrediction(String participant)
