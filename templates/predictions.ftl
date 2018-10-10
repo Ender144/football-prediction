@@ -27,7 +27,7 @@
                     <#list context.predictions as prediction>
                         <td style="text-align: center; vertical-align: middle; border-top: 1px solid #0003">
                             <div
-                                <#if context.scores.participantIsClosestToUs(prediction, game)>
+                                <#if context.scores.participantIsClosestToUs(prediction, game, game.getOurScore(), game.getTheirScore())>
                                     class="panel" style="margin-bottom: 0; background: #FFCB05; color: #00274C"
                                 </#if>>
                                 ${prediction.getGamePrediction(game).ourScore}
@@ -45,7 +45,7 @@
                     <#list context.predictions as prediction>
                         <td style="text-align: center; vertical-align: middle; border-top: 1px solid #0003">
                             <div
-                                <#if context.scores.participantIsClosestToThem(prediction, game)>
+                                <#if context.scores.participantIsClosestToThem(prediction, game, game.getOurScore(), game.getTheirScore())>
                                     class="panel" style="margin-bottom:0; background: ${context.colors.getOpponentColors(game, contextOpponents).getLeft()};
                                     color: ${context.colors.getOpponentColors(game, contextOpponents).getRight()}"
                                  </#if>

@@ -3,6 +3,7 @@ gradlew.bat
 
 .gradle/
 .idea/
+.vertx/
 build/
 conf/
 gradle/

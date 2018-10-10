@@ -4,6 +4,7 @@ public enum Outcome
 {
     WIN("W"),
     LOSE("L"),
+    IN_PROGRESS("In Progress"),
     UNPLAYED("Unplayed");
 
     private String printableOutcome;

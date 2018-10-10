@@ -56,6 +56,22 @@
         </encoder>
     </appender>
 
+    <appender name="ParticipantScores" class="ch.qos.logback.core.FileAppender">
+        <file>logs/ParticipantScores.log</file>
+        <param name="Append" value="false"/>
+        <encoder>
+            <pattern>%date %-5level %class{0}.%method - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="MainVerticle" class="ch.qos.logback.core.FileAppender">
+        <file>logs/MainVerticle.log</file>
+        <param name="Append" value="false"/>
+        <encoder>
+            <pattern>%date %-5level %class{0}.%method - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <logger name="org.clarke.database.DBConnection" level="debug">
         <appender-ref ref="Database"/>
     </logger>
@@ -74,6 +90,14 @@
 
     <logger name="org.clarke.ExcelSeasonOutput" level="debug">
         <appender-ref ref="Excel"/>
+    </logger>
+
+    <logger name="org.clarke.predictionModel.ParticipantScores" level="debug">
+        <appender-ref ref="ParticipantScores"/>
+    </logger>
+
+    <logger name="org.clarke.MainVerticle" level="debug">
+        <appender-ref ref="MainVerticle"/>
     </logger>
 
     <logger name="ch.qos.logback" level="OFF" additivity="false"/>

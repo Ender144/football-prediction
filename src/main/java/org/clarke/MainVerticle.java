@@ -1,5 +1,6 @@
 package org.clarke;
 
+import com.google.gson.Gson;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpServer;
@@ -8,13 +9,21 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.templ.FreeMarkerTemplateEngine;
 import io.vertx.ext.web.templ.TemplateEngine;
+import org.clarke.api.JsonResponse;
+import org.clarke.api.JsonRestMessenger;
+import org.clarke.boxscoreModel.Boxscore;
+import org.clarke.configuration.SR_API_Configuration;
 import org.clarke.parsers.TeamColorsManager;
 import org.clarke.predictionModel.ParticipantScores;
 import org.clarke.predictionModel.SeasonPrediction;
 import org.clarke.regularSeasonModel.Game;
 import org.clarke.regularSeasonModel.RegularSeason;
 import org.clarke.rosterModel.Opponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,23 +34,56 @@ import static org.clarke.Main.initializeTeam;
 @SuppressWarnings("unused")
 public class MainVerticle extends AbstractVerticle
 {
-    private RegularSeason season2018;
-    private ParticipantScores scores;
-    private List<SeasonPrediction> seasonPredictions;
-    private List<Opponent> opponents;
-    private TeamColorsManager colors;
-    private TemplateEngine engine;
+    private static final Logger logger = LoggerFactory.getLogger(MainVerticle.class);
+    private static final SR_API_Configuration SR_API_CONFIGURATION = SR_API_Configuration.getInstance();
+
+    private static RegularSeason season2018;
+    private static ParticipantScores scores;
+    private static List<SeasonPrediction> seasonPredictions;
+    private static List<Opponent> opponents;
+    private static TeamColorsManager colors;
+    private static TemplateEngine engine;
+
+    public static Boxscore getBoxscore(Game game)
+    {
+        Boxscore boxscore = new Boxscore();
+
+        logger.info("Loading boxscore from API...");
+        JsonResponse response = null;
+        try
+        {
+            System.out.println(SR_API_CONFIGURATION.getBoxScore(season2018, game));
+            response = JsonRestMessenger.get(SR_API_CONFIGURATION.getBoxScore(season2018, game));
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        if (response != null)
+        {
+            boxscore = new Gson().fromJson(response.getResponseJSON(), Boxscore.class);
+        }
+
+        return boxscore;
+    }
 
     @Override
     public void start(Future<Void> future)
     {
-        initializeModels(false);
+        vertx.executeBlocking(blockingFuture -> {
+            initializeModels(false);
+            colors = TeamColorsManager.getInstance();
+            blockingFuture.complete(colors);
+        }, result -> System.out.println("Models initialized and colors loaded..."));
 
-        colors = TeamColorsManager.getInstance();
         HttpServer server = vertx.createHttpServer();
 
         Router router = Router.router(vertx);
-        initializeRoutes(router);
+
+        vertx.executeBlocking(blockingFuture -> {
+            initializeRoutes(router);
+            blockingFuture.complete(router);
+        }, result -> System.out.println("Deployment finished"));
 
         engine = FreeMarkerTemplateEngine.create();
         router.route().handler(StaticHandler.create());
@@ -62,6 +104,29 @@ public class MainVerticle extends AbstractVerticle
     {
         initializeModels(false);
 
+        int ourScore = game.getOurScore();
+        int theirScore = game.getTheirScore();
+
+        Boxscore gameScore = new Boxscore();
+        if (game.getDate().isEqual(LocalDate.now()))
+        {
+            gameScore = getBoxscore(game);
+            logger.info(gameScore.toString());
+            if (gameScore.getAwayTeam().getId().equalsIgnoreCase("mich"))
+            {
+                ourScore = gameScore.getAwayTeam().getPoints();
+                theirScore = gameScore.getHomeTeam().getPoints();
+            } else
+            {
+                ourScore = gameScore.getHomeTeam().getPoints();
+                theirScore = gameScore.getAwayTeam().getPoints();
+            }
+            logger.info("boxscore points: us={}, them={}", ourScore, theirScore);
+        }
+
+        context.put("boxscore", gameScore);
+        context.put("ourScore", ourScore);
+        context.put("theirScore", theirScore);
         context.put("game", game);
         context.put("predictions", seasonPredictions);
         context.put("scores", scores);
@@ -141,6 +206,7 @@ public class MainVerticle extends AbstractVerticle
         }
 
         router.get("/rebuildSeason/").blockingHandler(context -> index(context, true));
+        router.get("/weekly-scores/").blockingHandler(this::weeklyScores);
     }
 
     private void playerPage(RoutingContext context, SeasonPrediction prediction)
@@ -162,5 +228,13 @@ public class MainVerticle extends AbstractVerticle
                 context.fail(response.cause());
             }
         });
+    }
+
+    private void weeklyScores(RoutingContext context)
+    {
+        //        Map<Game, >
+        //        context.response()
+        //            .putHeader("content-type", "application/json; charset=utf-8")
+        //            .end(Json.encodePrettily(/*Some map content*/));
     }
 }

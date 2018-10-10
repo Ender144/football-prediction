@@ -4,6 +4,9 @@
 <body>
     <#assign contextGame=context.game>
     <#assign contextOpponents=context.opponents>
+    <#assign contextBoxscore=context.boxscore>
+    <#assign contextOurScore=context.ourScore>
+    <#assign contextTheirScore=context.theirScore>
     <#include "./navbar.ftl"/>
     <div class="container">
         <h1 style="text-align: center">
@@ -15,8 +18,8 @@
                 <#else>
                     ${contextGame.us()} VS ${contextGame.them()}
                 </#if>
-                Score: ${contextGame.getOurScore()} - ${contextGame.getTheirScore()}
-                (<span style="vertical-align: middle"
+                Score: ${contextOurScore} - ${contextTheirScore}
+                <span style="vertical-align: middle"
                     <#if contextGame.getActualOutcome().toString() == "W">
                         class="label label-success">
                     <#elseif contextGame.getActualOutcome().toString() != "Unplayed">
@@ -24,8 +27,8 @@
                     <#else>
                         class="label">
                     </#if>
-                    ${contextGame.getActualOutcome()}
-                </span>)
+                    (${contextGame.getActualOutcome(contextBoxscore)})
+                </span>
             </div>
         </h1>
         <#include "./game_details.ftl"/>

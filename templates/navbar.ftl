@@ -34,8 +34,5 @@
                 </ul>
             </li>
         </ul>
-        <ul class="nav navbar-nav navbar-right">
-            <li><a href="/rebuildSeason/">Pull Scores<span class="sr-only">(current)</span></a></li>
-        </ul>
     </div>
 </nav>

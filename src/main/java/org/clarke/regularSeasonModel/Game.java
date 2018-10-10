@@ -1,5 +1,6 @@
 package org.clarke.regularSeasonModel;
 
+import org.clarke.boxscoreModel.Boxscore;
 import org.clarke.predictionModel.Outcome;
 
 import java.time.LocalDate;
@@ -30,79 +31,42 @@ public class Game implements Comparable<Game>
         return getDate().compareTo(otherGame.getDate());
     }
 
-    public String them()
-    {
-        return away.equalsIgnoreCase("mich") ? home : away;
-    }
-
-    public String getThem()
-    {
-        return them();
-    }
-
-    public String getUs()
-    {
-        return us();
-    }
-
-    public String us()
-    {
-        return away.equalsIgnoreCase("mich") ? away : home;
-    }
-
     public Outcome getActualOutcome()
     {
+        return getActualOutcome(null);
+    }
+
+    public Outcome getActualOutcome(Boxscore gameScore)
+    {
+        int ourScore = getOurScore();
+        int theirScore = getTheirScore();
+
         if ((home_points == null && away_points == null) || (home_points != null && home_points.equals("-1") && away_points != null && away_points.equals("-1")))
         {
-            return Outcome.UNPLAYED;
-        } else
-        {
-            return getOurScore() > getTheirScore() ? Outcome.WIN : Outcome.LOSE;
-        }
-    }
-
-    public String getAwayTeam()
-    {
-        return away;
-    }
-
-    public LocalDate getDate()
-    {
-        String pattern = "yyyy-MM-dd";
-        String substringScheduled;
-
-        substringScheduled = scheduled.substring(0, scheduled.indexOf("T"));
-
-        DateTimeFormatter simpleDateFormat = DateTimeFormatter.ofPattern(pattern, Locale.ENGLISH);
-
-        return LocalDate.parse(substringScheduled, simpleDateFormat);
-    }
-
-    public String getHomeTeam()
-    {
-        return home;
-    }
-
-    public int getOurScore()
-    {
-        boolean michiganIsAway = away.equalsIgnoreCase("mich");
-        if (away_points == null || home_points == null)
-        {
-            return -1;
+            if (getDate().isEqual(LocalDate.now()) && gameScore.getAwayTeam() != null)
+            {
+                if (gameScore.getCompleted() == null)
+                {
+                    return Outcome.IN_PROGRESS;
+                } else
+                {
+                    if (gameScore.getAwayTeam().getId().equalsIgnoreCase("mich"))
+                    {
+                        ourScore = gameScore.getAwayTeam().getPoints();
+                        theirScore = gameScore.getHomeTeam().getPoints();
+                    } else
+                    {
+                        ourScore = gameScore.getHomeTeam().getPoints();
+                        theirScore = gameScore.getAwayTeam().getPoints();
+                    }
+                }
+            } else
+            {
+                return Outcome.UNPLAYED;
+            }
         }
 
-        return michiganIsAway ? Integer.parseInt(away_points) : Integer.parseInt(home_points);
-    }
-
-    public int getTheirScore()
-    {
-        boolean michiganIsAway = away.equalsIgnoreCase("mich");
-        if (away_points == null || home_points == null)
-        {
-            return -1;
-        }
-
-        return michiganIsAway ? Integer.parseInt(home_points) : Integer.parseInt(away_points);
+        return ourScore > theirScore ? Outcome.WIN : Outcome.LOSE;
     }
 
     public String getAway()
@@ -113,6 +77,11 @@ public class Game implements Comparable<Game>
     public void setAway(String away)
     {
         this.away = away;
+    }
+
+    public String getAwayTeam()
+    {
+        return away;
     }
 
     public String getAway_points()
@@ -155,6 +124,18 @@ public class Game implements Comparable<Game>
         this.coverage = coverage;
     }
 
+    public LocalDate getDate()
+    {
+        String pattern = "yyyy-MM-dd";
+        String substringScheduled;
+
+        substringScheduled = scheduled.substring(0, scheduled.indexOf("T"));
+
+        DateTimeFormatter simpleDateFormat = DateTimeFormatter.ofPattern(pattern, Locale.ENGLISH);
+
+        return LocalDate.parse(substringScheduled, simpleDateFormat);
+    }
+
     public String getHome()
     {
         return home;
@@ -163,6 +144,11 @@ public class Game implements Comparable<Game>
     public void setHome(String home)
     {
         this.home = home;
+    }
+
+    public String getHomeTeam()
+    {
+        return home;
     }
 
     public String getHome_points()
@@ -205,6 +191,17 @@ public class Game implements Comparable<Game>
         this.neutral_site = neutral_site;
     }
 
+    public int getOurScore()
+    {
+        boolean michiganIsAway = away.equalsIgnoreCase("mich");
+        if (away_points == null || home_points == null)
+        {
+            return -1;
+        }
+
+        return michiganIsAway ? Integer.parseInt(away_points) : Integer.parseInt(home_points);
+    }
+
     public String getScheduled()
     {
         return scheduled;
@@ -225,6 +222,27 @@ public class Game implements Comparable<Game>
         this.status = status;
     }
 
+    public int getTheirScore()
+    {
+        boolean michiganIsAway = away.equalsIgnoreCase("mich");
+        if (away_points == null || home_points == null)
+        {
+            return -1;
+        }
+
+        return michiganIsAway ? Integer.parseInt(home_points) : Integer.parseInt(away_points);
+    }
+
+    public String getThem()
+    {
+        return them();
+    }
+
+    public String getUs()
+    {
+        return us();
+    }
+
     public Venue getVenue()
     {
         return venue;
@@ -243,5 +261,15 @@ public class Game implements Comparable<Game>
     public void setWeather(Weather weather)
     {
         this.weather = weather;
+    }
+
+    public String them()
+    {
+        return away.equalsIgnoreCase("mich") ? home : away;
+    }
+
+    public String us()
+    {
+        return away.equalsIgnoreCase("mich") ? away : home;
     }
 }
