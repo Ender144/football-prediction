@@ -1,4 +1,4 @@
-package org.clarke.api;
+package org.clarke.json;
 
 import com.google.gson.Gson;
 import org.clarke.configuration.SR_API_Configuration;
@@ -18,7 +18,7 @@ class SRDataTests
     {
         try
         {
-            JsonResponse response = JsonRestMessenger.get(srApiConfiguration.getRegularSeasonScheduleUrl());
+            Response response = RestMessenger.get(srApiConfiguration.getRegularSeasonScheduleUrl());
             RegularSeason season2018 = new Gson().fromJson(response.getResponseJSON(), RegularSeason.class);
             List<Game> michiganGames = season2018.getMichiganGamesThisSeason();
             for (Game game : michiganGames)

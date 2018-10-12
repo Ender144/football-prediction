@@ -1,11 +1,11 @@
-package org.clarke.api;
+package org.clarke.json;
 
-public class JsonResponse
+public class Response
 {
     private int httpStatus;
     private String responseJSON;
 
-    JsonResponse(int httpStatus, String responseJSON)
+    Response(int httpStatus, String responseJSON)
     {
         this.httpStatus = httpStatus;
         this.responseJSON = responseJSON;

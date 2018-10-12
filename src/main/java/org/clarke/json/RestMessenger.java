@@ -1,9 +1,8 @@
-package org.clarke.api;
+package org.clarke.json;
 
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.Credentials;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
@@ -16,11 +15,11 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JsonRestMessenger
+public class RestMessenger
 {
-    private static final Logger logger = LoggerFactory.getLogger(JsonRestMessenger.class);
-    
-    private static ResponseHandler<JsonResponse> responseHandler = new JsonResponseHandler();
+    private static final Logger logger = LoggerFactory.getLogger(RestMessenger.class);
+
+    private static ResponseHandler responseHandler = new ResponseHandler();
     private static Executor authExecutor = Executor.newInstance();
 
     public static void addAuthContext(HttpHost host, Credentials credentials)
@@ -28,7 +27,7 @@ public class JsonRestMessenger
         authExecutor.auth(host, credentials);
     }
 
-    public static JsonResponse get(String url, List<NameValuePair> formParameters) throws IOException
+    public static Response get(String url, List<NameValuePair> formParameters) throws IOException
     {
         url += "?" + formParameters.stream().map(nvp -> nvp.getName() + "=" + nvp.getValue()).collect(Collectors.joining("&"));
         return authExecutor.execute(
@@ -36,7 +35,7 @@ public class JsonRestMessenger
         ).handleResponse(responseHandler);
     }
 
-    public static JsonResponse get(String url) throws IOException
+    public static Response get(String url) throws IOException
     {
         logger.info("Fetching URL with GET: " + url);
         return authExecutor.execute(
@@ -44,16 +43,16 @@ public class JsonRestMessenger
         ).handleResponse(responseHandler);
     }
 
-    public static JsonResponse post(String url, String bodyString, ContentType contentType) throws IOException
+    public static Response post(String url, String bodyString, ContentType contentType) throws IOException
     {
         return authExecutor.execute(
             Request.Post(url).bodyString(bodyString, contentType)
         ).handleResponse(responseHandler);
     }
 
-    public static JsonResponse post(String address, String path, String bodyString, ContentType contentType) throws IOException
+    public static Response post(String address, String path, String bodyString, ContentType contentType) throws IOException
     {
-        JsonResponse response = null;
+        Response response = null;
 
         try
         {
@@ -71,7 +70,7 @@ public class JsonRestMessenger
         return response;
     }
 
-    public static JsonResponse post(String url, List<NameValuePair> formParameters) throws IOException
+    public static Response post(String url, List<NameValuePair> formParameters) throws IOException
     {
         return authExecutor.execute(
             Request.Post(url).bodyForm(formParameters)
