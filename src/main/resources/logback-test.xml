@@ -80,7 +80,7 @@
         <appender-ref ref="Main"/>
     </logger>
 
-    <logger name="org.clarke.api.JsonRestMessenger" level="debug">
+    <logger name="org.clarke.json.RestMessenger" level="debug">
         <appender-ref ref="API"/>
     </logger>
 

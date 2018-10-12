@@ -1,14 +1,13 @@
 package org.clarke.predictionModel;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.clarke.MainVerticle;
+import org.clarke.ModelManager;
 import org.clarke.boxscoreModel.Boxscore;
 import org.clarke.regularSeasonModel.Game;
 import org.clarke.regularSeasonModel.RegularSeason;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,47 +32,21 @@ public class ParticipantScores
 
     public int getScoreForGame(Game game, String participant)
     {
-        int ourScore = game.getOurScore();
-        int theirScore = game.getTheirScore();
-
-        if (game.getDate().isEqual(LocalDate.now()))
-        {
-            Boxscore gameScore = MainVerticle.getBoxscore(game);
-            logger.info(gameScore.toString());
-            if (gameScore.getAwayTeam().getId().equalsIgnoreCase("mich"))
-            {
-                ourScore = gameScore.getAwayTeam().getPoints();
-                theirScore = gameScore.getHomeTeam().getPoints();
-            } else
-            {
-                ourScore = gameScore.getHomeTeam().getPoints();
-                theirScore = gameScore.getAwayTeam().getPoints();
-            }
-            logger.info("boxscore points: us={}, them={}", ourScore, theirScore);
-        }
-
-        return getScoreForGame(game, participant, ourScore, theirScore);
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public int getScoreForGame(Game game, String participant, int ourScore, int theirScore)
-    {
         int score = 0;
         SeasonPrediction participantPrediction = getParticipantPrediction(participant);
-        logger.info("Game scores for {}, participant={}, ourScore={}, theirScore={}", game.getThem(), participant, ourScore, theirScore);
 
-        if (theirScore != -1 && ourScore != -1 && participantPrediction != null)
+        if (getCurrentGamePoints(game).getLeft() != -1 && getCurrentGamePoints(game).getRight() != -1 && participantPrediction != null)
         {
             score += predictedCorrectOutcome(participantPrediction, game) ?
                 MetricWeights.SAME_OUTCOME.getWeight() :
                 MetricWeights.DIFFERENT_OUTCOMES.getWeight();
 
-            if (participantIsClosestToUs(participantPrediction, game, ourScore, theirScore))
+            if (participantIsClosestToUs(participantPrediction, game))
             {
                 score += MetricWeights.CLOSEST_OUR_SCORE.getWeight();
             }
 
-            if (participantIsClosestToThem(participantPrediction, game, ourScore, theirScore))
+            if (participantIsClosestToThem(participantPrediction, game))
             {
                 score += MetricWeights.CLOSEST_THEIR_SCORE.getWeight();
             }
@@ -83,25 +56,49 @@ public class ParticipantScores
     }
 
     @SuppressWarnings("WeakerAccess")
-    public boolean participantIsClosestToThem(SeasonPrediction participantPrediction, Game game, int ourScore, int theirScore)
+    public boolean participantIsClosestToThem(SeasonPrediction participantPrediction, Game game)
     {
-        Pair<Integer, Integer> minimumPointsDifferences = getMinimumPointDifferences(game, ourScore, theirScore);
+        Pair<Integer, Integer> minimumPointsDifferences = getMinimumPointDifferences(game);
         logger.info("closest to them? min differences: us-difference={}, them-difference={}", minimumPointsDifferences.getLeft(), minimumPointsDifferences.getRight());
         int minimumTheirPointsDifference = minimumPointsDifferences.getRight();
 
-        logger.info("prediction and actual difference: {}, {}", minimumTheirPointsDifference, participantPrediction.getGamePrediction(game).getTheirScore() - theirScore);
-        return minimumTheirPointsDifference == Math.abs(participantPrediction.getGamePrediction(game).getTheirScore() - theirScore);
+        logger.info("prediction and actual difference: {}, {}", minimumTheirPointsDifference, participantPrediction.getGamePrediction(game).getTheirScore() - getCurrentGamePoints(game).getRight());
+        return minimumTheirPointsDifference == Math.abs(participantPrediction.getGamePrediction(game).getTheirScore() - getCurrentGamePoints(game).getRight());
     }
 
     @SuppressWarnings("WeakerAccess")
-    public boolean participantIsClosestToUs(SeasonPrediction participantPrediction, Game game, int ourScore, int theirScore)
+    public boolean participantIsClosestToUs(SeasonPrediction participantPrediction, Game game)
     {
-        Pair<Integer, Integer> minimumPointsDifferences = getMinimumPointDifferences(game, ourScore, theirScore);
+        Pair<Integer, Integer> minimumPointsDifferences = getMinimumPointDifferences(game);
         logger.info("closest to us? min differences: us-difference={}, them-difference={}", minimumPointsDifferences.getLeft(), minimumPointsDifferences.getRight());
         int minimumOurPointsDifference = minimumPointsDifferences.getLeft();
 
-        logger.info("prediction and actual difference: {}, {}", minimumOurPointsDifference, participantPrediction.getGamePrediction(game).getOurScore() - ourScore);
-        return minimumOurPointsDifference == Math.abs(participantPrediction.getGamePrediction(game).getOurScore() - ourScore);
+        logger.info("prediction and actual difference: {}, {}", minimumOurPointsDifference, participantPrediction.getGamePrediction(game).getOurScore() - getCurrentGamePoints(game).getLeft());
+        return minimumOurPointsDifference == Math.abs(participantPrediction.getGamePrediction(game).getOurScore() - getCurrentGamePoints(game).getLeft());
+    }
+
+    private Pair<Integer, Integer> getCurrentGamePoints(Game currentGame)
+    {
+        int ourScore = currentGame.getOurScore();
+        int theirScore = currentGame.getTheirScore();
+
+        Boxscore todaysBoxscore = ModelManager.getTodaysBoxscore();
+        if (!todaysBoxscore.getStatus().equals(ModelManager.UNINITIALIZED_BOXSCORE))
+        {
+            logger.info(todaysBoxscore.toString());
+            if (todaysBoxscore.getAwayTeam().getId().equalsIgnoreCase("mich"))
+            {
+                ourScore = todaysBoxscore.getAwayTeam().getPoints();
+                theirScore = todaysBoxscore.getHomeTeam().getPoints();
+            } else
+            {
+                ourScore = todaysBoxscore.getHomeTeam().getPoints();
+                theirScore = todaysBoxscore.getAwayTeam().getPoints();
+            }
+            logger.info("boxscore points: us={}, them={}", ourScore, theirScore);
+        }
+
+        return Pair.of(ourScore, theirScore);
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -118,10 +115,14 @@ public class ParticipantScores
         return false;
     }
 
-    private Pair<Integer, Integer> getMinimumPointDifferences(Game game, int ourScore, int theirScore)
+    private Pair<Integer, Integer> getMinimumPointDifferences(Game game)
     {
         int minimumOurScoreDifference = Integer.MAX_VALUE;
         int minimumTheirScoreDifference = Integer.MAX_VALUE;
+
+        Pair<Integer, Integer> currentGamePoints = getCurrentGamePoints(game);
+        int ourScore = currentGamePoints.getLeft();
+        int theirScore = currentGamePoints.getRight();
 
         if (theirScore != -1 && ourScore != -1)
         {

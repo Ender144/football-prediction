@@ -4,7 +4,6 @@
 <body>
     <#assign contextGame=context.game>
     <#assign contextOpponents=context.opponents>
-    <#assign contextBoxscore=context.boxscore>
     <#assign contextOurScore=context.ourScore>
     <#assign contextTheirScore=context.theirScore>
     <#include "./navbar.ftl"/>
@@ -27,7 +26,7 @@
                     <#else>
                         class="label">
                     </#if>
-                    (${contextGame.getActualOutcome(contextBoxscore)})
+                    (${contextGame.getActualOutcome()})
                 </span>
             </div>
         </h1>

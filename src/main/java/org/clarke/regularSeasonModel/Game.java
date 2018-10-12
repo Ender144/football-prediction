@@ -1,5 +1,6 @@
 package org.clarke.regularSeasonModel;
 
+import org.clarke.ModelManager;
 import org.clarke.boxscoreModel.Boxscore;
 import org.clarke.predictionModel.Outcome;
 
@@ -33,31 +34,27 @@ public class Game implements Comparable<Game>
 
     public Outcome getActualOutcome()
     {
-        return getActualOutcome(null);
-    }
-
-    public Outcome getActualOutcome(Boxscore gameScore)
-    {
         int ourScore = getOurScore();
         int theirScore = getTheirScore();
 
         if ((home_points == null && away_points == null) || (home_points != null && home_points.equals("-1") && away_points != null && away_points.equals("-1")))
         {
-            if (getDate().isEqual(LocalDate.now()) && gameScore.getAwayTeam() != null)
+            Boxscore todaysBoxscore = ModelManager.getTodaysBoxscore();
+            if (!todaysBoxscore.getStatus().equals(ModelManager.UNINITIALIZED_BOXSCORE))
             {
-                if (gameScore.getCompleted() == null)
+                if (todaysBoxscore.getCompleted() == null)
                 {
                     return Outcome.IN_PROGRESS;
                 } else
                 {
-                    if (gameScore.getAwayTeam().getId().equalsIgnoreCase("mich"))
+                    if (todaysBoxscore.getAwayTeam().getId().equalsIgnoreCase("mich"))
                     {
-                        ourScore = gameScore.getAwayTeam().getPoints();
-                        theirScore = gameScore.getHomeTeam().getPoints();
+                        ourScore = todaysBoxscore.getAwayTeam().getPoints();
+                        theirScore = todaysBoxscore.getHomeTeam().getPoints();
                     } else
                     {
-                        ourScore = gameScore.getHomeTeam().getPoints();
-                        theirScore = gameScore.getAwayTeam().getPoints();
+                        ourScore = todaysBoxscore.getHomeTeam().getPoints();
+                        theirScore = todaysBoxscore.getAwayTeam().getPoints();
                     }
                 }
             } else

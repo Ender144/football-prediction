@@ -21,7 +21,7 @@
                 <td style="text-align: center; vertical-align: middle; border-top: 1px solid #0003">
                     <div class="col-lg-2"></div>
                     <div
-                        <#if context.scores.participantIsClosestToUs(contextPrediction, game, game.getOurScore(), game.getTheirScore())>
+                        <#if context.scores.participantIsClosestToUs(contextPrediction, game)>
                             class="col-lg-8 panel" style="margin-bottom: 0; background: #FFCB05; color: #00274C"
                         <#else>class="col-lg-8"
                         </#if>
@@ -43,7 +43,7 @@
                 <td style="text-align: center; vertical-align: middle; border-top: 1px solid #0003">
                     <div class="col-lg-2"></div>
                     <div
-                        <#if context.scores.participantIsClosestToThem(contextPrediction, game, game.getOurScore(), game.getTheirScore())>
+                        <#if context.scores.participantIsClosestToThem(contextPrediction, game)>
                             class="col-lg-8 panel" style="margin-bottom: 0; background: ${context.colors.getOpponentColors(game, contextOpponents).getLeft()};
                             color: ${context.colors.getOpponentColors(game, contextOpponents).getRight()}"
                         <#else>class="col-lg-8"

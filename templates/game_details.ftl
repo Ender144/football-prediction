@@ -1,9 +1,6 @@
 <table class="table table-condensed table-sm table-hover">
     <#assign contextOpponents=context.opponents>
     <#assign contextGame=context.game>
-    <#assign contextBoxscore=context.boxscore>
-    <#assign contextOurScore=context.ourScore>
-    <#assign contextTheirScore=context.theirScore>
     <#assign i=0>
     <thead>
         <tr style="font-size: 26px">
@@ -21,7 +18,7 @@
                 <td style="text-align: center; vertical-align: middle; border-top: 1px solid #0003">
                     <div class="col-lg-2"></div>
                     <div
-                        <#if context.scores.participantIsClosestToUs(prediction, contextGame, contextOurScore, contextTheirScore)>
+                        <#if context.scores.participantIsClosestToUs(prediction, contextGame)>
                             class="col-lg-8 panel" style="margin-bottom: 0; background: #FFCB05; color: #00274C"
                         <#else>class="col-lg-8"
                         </#if>
@@ -33,7 +30,7 @@
                 <td style="text-align: center; vertical-align: middle; border-top: 1px solid #0003">
                     <div class="col-lg-2"></div>
                     <div
-                        <#if context.scores.participantIsClosestToThem(prediction, contextGame, contextOurScore, contextTheirScore)>
+                        <#if context.scores.participantIsClosestToThem(prediction, contextGame)>
                             class="col-lg-8 panel" style="margin-bottom: 0; background: ${context.colors.getOpponentColors(contextGame, contextOpponents).getLeft()};
                             color: ${context.colors.getOpponentColors(contextGame, contextOpponents).getRight()}"
                             <#else>class="col-lg-8"
@@ -47,7 +44,7 @@
                     <span style="font-size: 48px"
                         <#if context.scores.predictedCorrectOutcome(prediction, contextGame)>
                             class="label label-success"
-                        <#elseif contextGame.getActualOutcome(contextBoxscore).toString() != "Unplayed">
+                        <#elseif contextGame.getActualOutcome().toString() != "Unplayed">
                             class="label label-danger"
                         </#if>>
                         ${prediction.getGamePrediction(contextGame).getPredictedOutcome()}
@@ -57,7 +54,7 @@
                     <div>
                         <strong>
                             <span style="font-size: 48px">
-                                ${context.scores.getScoreForGame(contextGame, prediction.participant, contextOurScore, contextTheirScore)}
+                                ${context.scores.getScoreForGame(contextGame, prediction.participant)}
                             </span>
                         </strong>
                     </div>
