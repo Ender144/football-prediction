@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,9 +29,11 @@ import java.util.TreeMap;
 public class ModelManager
 {
     public static final String UNINITIALIZED_BOXSCORE = "uninitialized";
-
-    private static final List<String> participants = new ArrayList<>();
+    public static final String PRE_GAME_BOXSCORE = "created";
+    //    public static final String POST_GAME_BOXSCORE = "closed";
+    // Logger
     private static final Logger logger = LoggerFactory.getLogger(ModelManager.class);
+    private static final List<String> participants = new ArrayList<>();
     private static final String PREDICTIONS_CONFIG = "predictions.properties";
     private static final String DATABASE_CONFIG = "database.properties";
     private static final SR_API_Configuration SR_API_CONFIGURATION = SR_API_Configuration.getInstance();
@@ -137,8 +140,10 @@ public class ModelManager
                 if (game.getDate().isEqual(LocalDate.now()))
                 {
                     initializedBoxscore = true;
+                    System.out.println("Getting today's boxscore...");
                     initializeBoxscore(game);
-                    logger.info(todaysBoxscore.toString());
+                    logger.info("Today's boxscore retrieved at {}", LocalDateTime.now());
+                    logger.info("Boxscore: {}", todaysBoxscore.toString());
                 }
             }
 
@@ -323,6 +328,20 @@ public class ModelManager
         dbConnection.addTeam(team);
 
         return team;
+    }
+
+    static void checkBoxscore()
+    {
+        for (Game game : season.getMichiganGamesThisSeason())
+        {
+            if (game.getDate().isEqual(LocalDate.now()))
+            {
+                System.out.println("Getting today's boxscore...");
+                initializeBoxscore(game);
+                logger.info("Today's boxscore retrieved at {}", LocalDateTime.now());
+                logger.info("Boxscore: {}", todaysBoxscore.toString());
+            }
+        }
     }
 
     static List<SeasonPrediction> getSeasonPredictions()

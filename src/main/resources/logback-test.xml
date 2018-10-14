@@ -72,6 +72,14 @@
         </encoder>
     </appender>
 
+    <appender name="ModelManager" class="ch.qos.logback.core.FileAppender">
+        <file>logs/ModelManager.log</file>
+        <param name="Append" value="false"/>
+        <encoder>
+            <pattern>%date %-5level %class{0}.%method - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <logger name="org.clarke.database.DBConnection" level="debug">
         <appender-ref ref="Database"/>
     </logger>
@@ -98,6 +106,10 @@
 
     <logger name="org.clarke.MainVerticle" level="debug">
         <appender-ref ref="MainVerticle"/>
+    </logger>
+
+    <logger name="org.clarke.ModelManager" level="debug">
+        <appender-ref ref="ModelManager"/>
     </logger>
 
     <logger name="ch.qos.logback" level="OFF" additivity="false"/>

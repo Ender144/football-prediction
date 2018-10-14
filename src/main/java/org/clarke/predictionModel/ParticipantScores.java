@@ -27,7 +27,10 @@ public class ParticipantScores
 
     public int getCurrentParticipantScore(String participant)
     {
-        return regularSeason.getMichiganGamesThisSeason().stream().mapToInt(game -> getScoreForGame(game, participant)).sum();
+        int participantScore = regularSeason.getMichiganGamesThisSeason().stream().mapToInt(game -> getScoreForGame(game, participant)).sum();
+        logger.info("Getting current participant score: {} = {}", participant, participantScore);
+
+        return participantScore;
     }
 
     public int getScoreForGame(Game game, String participant)
@@ -59,10 +62,8 @@ public class ParticipantScores
     public boolean participantIsClosestToThem(SeasonPrediction participantPrediction, Game game)
     {
         Pair<Integer, Integer> minimumPointsDifferences = getMinimumPointDifferences(game);
-        logger.info("closest to them? min differences: us-difference={}, them-difference={}", minimumPointsDifferences.getLeft(), minimumPointsDifferences.getRight());
         int minimumTheirPointsDifference = minimumPointsDifferences.getRight();
 
-        logger.info("prediction and actual difference: {}, {}", minimumTheirPointsDifference, participantPrediction.getGamePrediction(game).getTheirScore() - getCurrentGamePoints(game).getRight());
         return minimumTheirPointsDifference == Math.abs(participantPrediction.getGamePrediction(game).getTheirScore() - getCurrentGamePoints(game).getRight());
     }
 
@@ -70,10 +71,8 @@ public class ParticipantScores
     public boolean participantIsClosestToUs(SeasonPrediction participantPrediction, Game game)
     {
         Pair<Integer, Integer> minimumPointsDifferences = getMinimumPointDifferences(game);
-        logger.info("closest to us? min differences: us-difference={}, them-difference={}", minimumPointsDifferences.getLeft(), minimumPointsDifferences.getRight());
         int minimumOurPointsDifference = minimumPointsDifferences.getLeft();
 
-        logger.info("prediction and actual difference: {}, {}", minimumOurPointsDifference, participantPrediction.getGamePrediction(game).getOurScore() - getCurrentGamePoints(game).getLeft());
         return minimumOurPointsDifference == Math.abs(participantPrediction.getGamePrediction(game).getOurScore() - getCurrentGamePoints(game).getLeft());
     }
 
@@ -83,9 +82,12 @@ public class ParticipantScores
         int theirScore = currentGame.getTheirScore();
 
         Boxscore todaysBoxscore = ModelManager.getTodaysBoxscore();
-        if (!todaysBoxscore.getStatus().equals(ModelManager.UNINITIALIZED_BOXSCORE))
+        logger.info("checking if game is in progress to calculate scores; game status = {}, game completed = {}", todaysBoxscore.getStatus(), todaysBoxscore.getCompleted());
+        if (!todaysBoxscore.getStatus().equals(ModelManager.UNINITIALIZED_BOXSCORE) &&
+            !todaysBoxscore.getStatus().equals(ModelManager.PRE_GAME_BOXSCORE) &&
+            todaysBoxscore.getAwayTeam().getId().equals(currentGame.getAway()) &&
+            todaysBoxscore.getHomeTeam().getId().equals(currentGame.getHome()))
         {
-            logger.info(todaysBoxscore.toString());
             if (todaysBoxscore.getAwayTeam().getId().equalsIgnoreCase("mich"))
             {
                 ourScore = todaysBoxscore.getAwayTeam().getPoints();
@@ -95,7 +97,6 @@ public class ParticipantScores
                 ourScore = todaysBoxscore.getHomeTeam().getPoints();
                 theirScore = todaysBoxscore.getAwayTeam().getPoints();
             }
-            logger.info("boxscore points: us={}, them={}", ourScore, theirScore);
         }
 
         return Pair.of(ourScore, theirScore);

@@ -40,7 +40,7 @@ public class Game implements Comparable<Game>
         if ((home_points == null && away_points == null) || (home_points != null && home_points.equals("-1") && away_points != null && away_points.equals("-1")))
         {
             Boxscore todaysBoxscore = ModelManager.getTodaysBoxscore();
-            if (!todaysBoxscore.getStatus().equals(ModelManager.UNINITIALIZED_BOXSCORE))
+            if (!todaysBoxscore.getStatus().equals(ModelManager.UNINITIALIZED_BOXSCORE) && !todaysBoxscore.getStatus().equals(ModelManager.PRE_GAME_BOXSCORE))
             {
                 if (todaysBoxscore.getCompleted() == null)
                 {

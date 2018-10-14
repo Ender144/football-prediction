@@ -37,7 +37,7 @@ public class MainVerticle extends AbstractVerticle
     public void start(Future<Void> future)
     {
         vertx.executeBlocking(blockingFuture -> {
-            initializeModels(false);
+            initializeModels(false, false);
             colors = TeamColorsManager.getInstance();
             blockingFuture.complete(colors);
         }, result -> System.out.println("Models initialized and colors loaded..."));
@@ -68,7 +68,7 @@ public class MainVerticle extends AbstractVerticle
 
     private void gamePage(RoutingContext context, Game game)
     {
-        initializeModels(false);
+        initializeModels(false, true);
 
         int ourScore = game.getOurScore();
         int theirScore = game.getTheirScore();
@@ -76,7 +76,6 @@ public class MainVerticle extends AbstractVerticle
         Boxscore gameScore = ModelManager.getTodaysBoxscore();
         if (!gameScore.getStatus().equals(ModelManager.UNINITIALIZED_BOXSCORE))
         {
-            logger.info(gameScore.toString());
             if (gameScore.getAwayTeam().getId().equalsIgnoreCase("mich"))
             {
                 ourScore = gameScore.getAwayTeam().getPoints();
@@ -86,7 +85,6 @@ public class MainVerticle extends AbstractVerticle
                 ourScore = gameScore.getHomeTeam().getPoints();
                 theirScore = gameScore.getAwayTeam().getPoints();
             }
-            logger.info("boxscore points: us={}, them={}", ourScore, theirScore);
         }
 
         context.put("ourScore", ourScore);
@@ -110,7 +108,7 @@ public class MainVerticle extends AbstractVerticle
 
     private void index(RoutingContext context, boolean rebuildSeason)
     {
-        initializeModels(rebuildSeason);
+        initializeModels(rebuildSeason, false);
         context.put("scores", scores);
         context.put("season", season);
         context.put("predictions", seasonPredictions);
@@ -127,11 +125,15 @@ public class MainVerticle extends AbstractVerticle
         });
     }
 
-    private void initializeModels(boolean rebuildSeason)
+    private void initializeModels(boolean rebuildSeason, boolean checkBoxscore)
     {
         if (rebuildSeason)
         {
             ModelManager.rebuildSeason();
+        }
+        if (checkBoxscore)
+        {
+            ModelManager.checkBoxscore();
         }
 
         season = ModelManager.getSeason();
@@ -160,7 +162,7 @@ public class MainVerticle extends AbstractVerticle
 
     private void playerPage(RoutingContext context, SeasonPrediction prediction)
     {
-        initializeModels(false);
+        initializeModels(false, false);
 
         context.put("prediction", prediction);
         context.put("predictions", seasonPredictions);
