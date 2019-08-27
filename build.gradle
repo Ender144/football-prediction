@@ -42,15 +42,15 @@ dependencies {
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     compile group: 'postgresql', name: 'postgresql', version: '9.1-901-1.jdbc4'
 
-    implementation 'io.vertx:vertx-core:3.5.3'
-    implementation 'io.vertx:vertx-web:3.5.3'
-    implementation 'io.vertx:vertx-web-templ-freemarker:3.5.3'
+    implementation 'io.vertx:vertx-core:3.8.1'
+    implementation 'io.vertx:vertx-web:3.8.1'
+    implementation 'io.vertx:vertx-web-templ-freemarker:3.8.1'
 
 //    testCompile group: 'com.google.appengine', name: 'appengine-testing', version: '1.9.64'
 //    testCompile group: 'com.google.appengine', name: 'appengine-api-stubs', version: '1.9.64'
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.0'
 
-    testImplementation 'io.vertx:vertx-junit5:3.5.3'
+    testImplementation 'io.vertx:vertx-junit5:3.8.1'
 
     testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
     testRuntime 'org.junit.platform:junit-platform-launcher:1.1.0'

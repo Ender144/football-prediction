@@ -14,68 +14,59 @@ import javax.persistence.UniqueConstraint;
 @Entity
 @SuppressWarnings({"WeakerAccess", "unused"})
 @Table(schema = "regular_season", name = "Wind", uniqueConstraints = {@UniqueConstraint(columnNames = "wind_id")})
-public class DbWind
-{
-    @Transient
-    public static final String ID = "wind_id";
-    @Transient
-    public static final String SPEED = "speed";
-    @Transient
-    public static final String DIRECTION = "direction";
+public class DbWind {
+	@Transient
+	public static final String ID = "wind_id";
+	@Transient
+	public static final String SPEED = "speed";
+	@Transient
+	public static final String DIRECTION = "direction";
 
-    @Id
-    @GeneratedValue
-    @Column(name = ID)
-    private int id;
+	@Id
+	@GeneratedValue
+	@Column(name = ID)
+	private int id;
 
-    @Column(name = SPEED)
-    private String speed;
+	@Column(name = SPEED)
+	private String speed;
 
-    @Column(name = DIRECTION)
-    private String direction;
+	@Column(name = DIRECTION)
+	private String direction;
 
-    @OneToOne(mappedBy = "dbWind", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private DbWeather dbWeather;
+	@OneToOne(mappedBy = "dbWind", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private DbWeather dbWeather;
 
-    public DbWind() {}
+	public DbWind() {}
 
-    public DbWeather getDbWeather()
-    {
-        return dbWeather;
-    }
+	public DbWeather getDbWeather() {
+		return dbWeather;
+	}
 
-    public void setDbWeather(DbWeather dbWeather)
-    {
-        this.dbWeather = dbWeather;
-    }
+	public void setDbWeather(DbWeather dbWeather) {
+		this.dbWeather = dbWeather;
+	}
 
-    public String getDirection()
-    {
-        return direction;
-    }
+	public String getDirection() {
+		return direction;
+	}
 
-    public void setDirection(String direction)
-    {
-        this.direction = direction;
-    }
+	public void setDirection(String direction) {
+		this.direction = direction;
+	}
 
-    public int getId()
-    {
-        return id;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public void setId(int id)
-    {
-        this.id = id;
-    }
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    public String getSpeed()
-    {
-        return speed;
-    }
+	public String getSpeed() {
+		return speed;
+	}
 
-    public void setSpeed(String speed)
-    {
-        this.speed = speed;
-    }
+	public void setSpeed(String speed) {
+		this.speed = speed;
+	}
 }

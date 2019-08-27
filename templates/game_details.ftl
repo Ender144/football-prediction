@@ -1,6 +1,6 @@
 <table class="table table-condensed table-sm table-hover">
-    <#assign contextOpponents=context.opponents>
-    <#assign contextGame=context.game>
+    <#assign contextOpponents=opponents>
+    <#assign contextGame=game>
     <#assign i=0>
     <thead>
         <tr style="font-size: 26px">
@@ -12,13 +12,13 @@
         </tr>
     </thead>
     <tbody>
-        <#list context.predictions as prediction>
+        <#list predictions as prediction>
             <tr <#if i % 2 == 0>class="info"</#if>>
                 <th scope="row" style="text-align: center; vertical-align: middle; border-top: 1px solid #0003"><span style="font-size: 48px">${prediction.participant}</span></th>
                 <td style="text-align: center; vertical-align: middle; border-top: 1px solid #0003">
                     <div class="col-lg-2"></div>
                     <div
-                        <#if context.scores.participantIsClosestToUs(prediction, contextGame)>
+                        <#if scores.participantIsClosestToUs(prediction, contextGame)>
                             class="col-lg-8 panel" style="margin-bottom: 0; background: #FFCB05; color: #00274C"
                         <#else>class="col-lg-8"
                         </#if>
@@ -30,9 +30,9 @@
                 <td style="text-align: center; vertical-align: middle; border-top: 1px solid #0003">
                     <div class="col-lg-2"></div>
                     <div
-                        <#if context.scores.participantIsClosestToThem(prediction, contextGame)>
-                            class="col-lg-8 panel" style="margin-bottom: 0; background: ${context.colors.getOpponentColors(contextGame, contextOpponents).getLeft()};
-                            color: ${context.colors.getOpponentColors(contextGame, contextOpponents).getRight()}"
+                        <#if scores.participantIsClosestToThem(prediction, contextGame)>
+                            class="col-lg-8 panel" style="margin-bottom: 0; background: ${colors.getOpponentColors(contextGame, contextOpponents).getLeft()};
+                            color: ${colors.getOpponentColors(contextGame, contextOpponents).getRight()}"
                             <#else>class="col-lg-8"
                         </#if>
                     >
@@ -42,7 +42,7 @@
                 </td>
                 <td style="text-align: center; vertical-align: middle; border-top: 1px solid #0003">
                     <span style="font-size: 48px"
-                        <#if context.scores.predictedCorrectOutcome(prediction, contextGame)>
+                        <#if scores.predictedCorrectOutcome(prediction, contextGame)>
                             class="label label-success"
                         <#elseif contextGame.getActualOutcome().toString() != "Unplayed">
                             class="label label-danger"
@@ -54,7 +54,7 @@
                     <div>
                         <strong>
                             <span style="font-size: 48px">
-                                ${context.scores.getScoreForGame(contextGame, prediction.participant)}
+                                ${scores.getScoreForGame(contextGame, prediction.participant)}
                             </span>
                         </strong>
                     </div>

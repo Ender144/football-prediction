@@ -2,16 +2,16 @@
 <html lang="en">
 <#include "./head.ftl"/>
 <body>
-    <#assign contextGame=context.game>
-    <#assign contextOpponents=context.opponents>
-    <#assign contextOurScore=context.ourScore>
-    <#assign contextTheirScore=context.theirScore>
+    <#assign contextGame=game>
+    <#assign contextOpponents=opponents>
+    <#assign contextOurScore=ourScore>
+    <#assign contextTheirScore=theirScore>
     <#include "./navbar.ftl"/>
     <div class="container">
         <h1 style="text-align: center">
             <div class="well"
-                style="margin-bottom: 0; background: ${context.colors.getOpponentColors(contextGame, contextOpponents).getLeft()};
-                 color: ${context.colors.getOpponentColors(contextGame, contextOpponents).getRight()}">
+                style="margin-bottom: 0; background: ${colors.getOpponentColors(contextGame, contextOpponents).getLeft()};
+                 color: ${colors.getOpponentColors(contextGame, contextOpponents).getRight()}">
                 <#if contextGame.getAwayTeam() == contextGame.us()>
                     ${contextGame.us()} AT ${contextGame.them()}
                 <#else>

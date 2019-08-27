@@ -16,7 +16,7 @@
                     People <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <#list context.predictions as prediction>
+                    <#list predictions as prediction>
                         <li><a href="/${prediction.participant}">${prediction.participant}</a></li>
                     </#list>
                 </ul>
@@ -28,7 +28,7 @@
                     Games <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <#list context.season.michiganGamesThisSeason as game>
+                    <#list season.michiganGamesThisSeason as game>
                         <li><a href="/${game.them()}">${game.them()}</a></li>
                     </#list>
                 </ul>

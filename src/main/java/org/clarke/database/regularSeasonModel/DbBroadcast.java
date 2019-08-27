@@ -14,70 +14,59 @@ import javax.persistence.UniqueConstraint;
 @Entity
 @SuppressWarnings({"WeakerAccess", "unused"})
 @Table(schema = "regular_season", name = "Broadcast", uniqueConstraints = {@UniqueConstraint(columnNames = "broadcast_id")})
-public class DbBroadcast
-{
-    @Transient
-    public static final String ID = "broadcast_id";
-    @Transient
-    public static final String NETWORK = "network";
-    @Transient
-    public static final String SATELLITE = "satellite";
+public class DbBroadcast {
+	@Transient
+	public static final String ID = "broadcast_id";
+	@Transient
+	public static final String NETWORK = "network";
+	@Transient
+	public static final String SATELLITE = "satellite";
 
-    @Id
-    @GeneratedValue
-    @Column(name = ID)
-    private int id;
+	@Id
+	@GeneratedValue
+	@Column(name = ID)
+	private int id;
 
-    @Column(name = NETWORK, nullable = false)
-    private String network = "unknown";
+	@Column(name = NETWORK, nullable = false)
+	private String network = "unknown";
 
-    @Column(name = SATELLITE, nullable = false)
-    private String satellite = "unknown";
+	@Column(name = SATELLITE, nullable = false)
+	private String satellite = "unknown";
 
-    @OneToOne(mappedBy = "dbBroadcast", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private DbGame dbGame;
+	@OneToOne(mappedBy = "dbBroadcast", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private DbGame dbGame;
 
-    public DbBroadcast() {}
+	public DbBroadcast() {}
 
-    public int getId()
-    {
-        return id;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public void setId(int id)
-    {
-        this.id = id;
-    }
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    public String getNetwork()
-    {
-        return network;
-    }
+	public String getNetwork() {
+		return network;
+	}
 
-    public void setNetwork(String network)
-    {
-        if (network == null)
-        {
-            this.network = "unknown";
-        } else
-        {
-            this.network = network;
-        }
-    }
+	public void setNetwork(String network) {
+		if (network == null) {
+			this.network = "unknown";
+		} else {
+			this.network = network;
+		}
+	}
 
-    public String getSatellite()
-    {
-        return satellite;
-    }
+	public String getSatellite() {
+		return satellite;
+	}
 
-    public void setSatellite(String satellite)
-    {
-        if (satellite == null)
-        {
-            this.satellite = "unknown";
-        } else
-        {
-            this.satellite = satellite;
-        }
-    }
+	public void setSatellite(String satellite) {
+		if (satellite == null) {
+			this.satellite = "unknown";
+		} else {
+			this.satellite = satellite;
+		}
+	}
 }
