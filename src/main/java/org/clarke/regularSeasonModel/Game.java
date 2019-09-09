@@ -34,7 +34,12 @@ public class Game implements Comparable<Game> {
 		int ourScore = getOurScore();
 		int theirScore = getTheirScore();
 
-		if ((home_points == null && away_points == null) || (home_points != null && home_points.equals("-1") && away_points != null && away_points.equals("-1"))) {
+		if (getDate().isAfter(LocalDate.now())) {
+			return Outcome.UNPLAYED;
+		}
+
+		// TODO this logic changed, will it fail before the game on game day or after the game?
+		if (getDate().isEqual(LocalDate.now())) {
 			Boxscore todaysBoxscore = ModelManager.getTodaysBoxscore();
 			if (!todaysBoxscore.getStatus().equals(ModelManager.UNINITIALIZED_BOXSCORE) && !todaysBoxscore.getStatus().equals(ModelManager.PRE_GAME_BOXSCORE)) {
 				if (todaysBoxscore.getCompleted() == null) {

@@ -18,6 +18,7 @@ import org.clarke.rosterModel.Opponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -35,7 +36,7 @@ public class MainVerticle extends AbstractVerticle {
 	@Override
 	public void start(Future<Void> future) {
 		vertx.executeBlocking(blockingFuture -> {
-			initializeModels(false, false);
+			initializeModels(false);
 			colors = TeamColorsManager.getInstance();
 			blockingFuture.complete(colors);
 		}, result -> System.out.println("Models initialized and colors loaded..."));
@@ -97,13 +98,12 @@ public class MainVerticle extends AbstractVerticle {
 	}
 
 	private void index(RoutingContext context, boolean rebuildSeason) {
-		initializeModels(rebuildSeason, false);
+		initializeModels(rebuildSeason);
 		context.put("scores", scores);
 		context.put("season", season);
 		context.put("predictions", seasonPredictions);
 		context.put("opponents", opponents);
 		context.put("colors", colors);
-		System.out.println(context.data().toString());
 		engine.render(context.data(), "templates/index_body.ftl", response -> {
 			if (response.succeeded()) {
 				context.response().end(response.result());
@@ -113,13 +113,11 @@ public class MainVerticle extends AbstractVerticle {
 		});
 	}
 
-	private void initializeModels(boolean rebuildSeason, boolean checkBoxscore) {
+	private void initializeModels(boolean rebuildSeason) {
 		if (rebuildSeason) {
 			ModelManager.rebuildSeason();
 		}
-		if (checkBoxscore) {
-			ModelManager.checkBoxscore();
-		}
+		ModelManager.checkBoxscore();
 
 		season = ModelManager.getSeason();
 		seasonPredictions = ModelManager.getSeasonPredictions();
@@ -143,7 +141,7 @@ public class MainVerticle extends AbstractVerticle {
 	}
 
 	private void playerPage(RoutingContext context, SeasonPrediction prediction) {
-		initializeModels(false, false);
+		initializeModels(false);
 
 		context.put("prediction", prediction);
 		context.put("predictions", seasonPredictions);

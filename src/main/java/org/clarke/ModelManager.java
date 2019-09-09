@@ -32,7 +32,7 @@ public class ModelManager {
 	//    public static final String POST_GAME_BOXSCORE = "closed";
 	// Logger
 	private static final Logger logger = LoggerFactory.getLogger(ModelManager.class);
-	private static final String DEFAULT_SEASON = "2018";
+	private static final String DEFAULT_SEASON = "2019";
 	private static final String SEASON_KEY = "season";
 	private static final List<String> participants = new ArrayList<>();
 	private static final String PREDICTIONS_CONFIG = "predictions-" + DEFAULT_SEASON + ".properties";
@@ -58,6 +58,7 @@ public class ModelManager {
 		participants.add("Britt");
 		participants.add("Tyler");
 		participants.add("Heather");
+		participants.add("Kara");
 
 		Configuration dbConfig = new Configuration(DATABASE_CONFIG);
 		overwriteSeason = dbConfig.getBooleanValue("overwriteSeason", false);
@@ -133,6 +134,11 @@ public class ModelManager {
 
 			if (response != null) {
 				todaysBoxscore = new Gson().fromJson(response.getResponseJSON(), Boxscore.class);
+
+				// TODO I started changing these values on game day, will it work before / after the game too? on non-game days?
+				game.setHome_points(String.valueOf(todaysBoxscore.getHomeTeam().getPoints()));
+				game.setAway_points(String.valueOf(todaysBoxscore.getAwayTeam().getPoints()));
+				game.setStatus(todaysBoxscore.getStatus());
 			}
 		}
 	}
@@ -240,10 +246,12 @@ public class ModelManager {
 	}
 
 	private static void initializeSeasonModel() {
+		String connectionOutcome = dbConnection.connect();
+
 		if (overwriteSeason) {
 			logger.info("Overwriting DB Season via configuration...");
 			loadSeasonFromAPI();
-		} else if (!dbConnection.connect().isEmpty()) {
+		} else if (!connectionOutcome.isEmpty()) {
 			logger.error("Database could not connect... ");
 			loadSeasonFromAPI();
 		} else {
