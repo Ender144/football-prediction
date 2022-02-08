@@ -64,19 +64,24 @@ public class MainVerticle extends AbstractVerticle {
 	}
 
 	private void gamePage(RoutingContext context, Game game) {
-		initializeModels(false, true);
-
 		int ourScore = game.getOurScore();
 		int theirScore = game.getTheirScore();
 
-		Boxscore gameScore = ModelManager.getTodaysBoxscore();
-		if (!gameScore.getStatus().equals(ModelManager.UNINITIALIZED_BOXSCORE)) {
-			if (gameScore.getAwayTeam().getId().equalsIgnoreCase("mich")) {
-				ourScore = gameScore.getAwayTeam().getPoints();
-				theirScore = gameScore.getHomeTeam().getPoints();
-			} else {
-				ourScore = gameScore.getHomeTeam().getPoints();
-				theirScore = gameScore.getAwayTeam().getPoints();
+		if (game.getDate().isEqual(LocalDate.now())) {
+			initializeModels(false);
+
+			ourScore = game.getOurScore();
+			theirScore = game.getTheirScore();
+
+			Boxscore gameScore = ModelManager.getTodaysBoxscore();
+			if (!gameScore.getStatus().equals(ModelManager.UNINITIALIZED_BOXSCORE)) {
+				if (gameScore.getAwayTeam().getId().equalsIgnoreCase("mich")) {
+					ourScore = gameScore.getAwayTeam().getPoints();
+					theirScore = gameScore.getHomeTeam().getPoints();
+				} else {
+					ourScore = gameScore.getHomeTeam().getPoints();
+					theirScore = gameScore.getAwayTeam().getPoints();
+				}
 			}
 		}
 
